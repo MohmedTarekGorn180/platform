@@ -1,0 +1,4081 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2b6b">
+<meta name="description" content="منصة أقدر — المحتوى التعليمي التفاعلي مع الذكاء الاصطناعي">
+<title>المحتوى التعليمي | منصة أقدر</title>
+
+<style>
+/* ============================================================
+   أقدر | AQDAR — صفحة المحتوى التعليمي + الذكاء الاصطناعي V3
+   ============================================================ */
+:root{
+  --blue-700:#1248b8; --blue-600:#1b5fd9;
+  --cyan-500:#0e9bb8; --cyan-400:#12b6d8;
+  --yellow-500:#ffb020; --yellow-300:#ffd86b;
+  --green-500:#16a34a; --green-400:#22c55e;
+  --red-500:#dc2626; --red-400:#ef4444;
+  --purple-600:#5b3bb5; --purple-400:#8b5cf6;
+  --pink-500:#ec4899;
+  --bg:#eef4ff; --surface:#ffffff; --surface-soft:#f7faff;
+  --border:#d5e1f5; --border-strong:#a8c1e8;
+  --ink:#0d2350; --ink-soft:#3d5a8c; --ink-mute:#5d6f94;
+  --focus-ring: 0 0 0 3px #ffffff, 0 0 0 6px var(--blue-700);
+  --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-2xl:28px;
+  --shadow-sm:0 2px 8px rgba(18,72,184,.06);
+  --shadow-md:0 6px 20px rgba(18,72,184,.10);
+  --shadow-lg:0 24px 60px rgba(11,43,107,.18);
+  --shadow-glow:0 0 0 4px rgba(18,182,216,.15), 0 20px 40px rgba(18,72,184,.20);
+  --ease:cubic-bezier(.22,.9,.28,1);
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+}
+[data-theme="dark"]{
+  --bg:#060f26; --surface:#0f2150; --surface-soft:#152a5e;
+  --border:#28477f; --border-strong:#3d5fa0;
+  --ink:#eef3ff; --ink-soft:#b8c9e8; --ink-mute:#9ab0d6;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
+  --shadow-md:0 6px 20px rgba(0,0,0,.35);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.5);
+  --focus-ring: 0 0 0 3px #060f26, 0 0 0 6px var(--cyan-400);
+}
+[data-theme="dark"] body{ background:#060f26; }
+
+*{ box-sizing:border-box; }
+html, body{ margin:0; padding:0; min-height:100%; }
+body{
+  font-family:"Cairo","Tajawal","Noto Sans Arabic","Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+  color:var(--ink); background:var(--bg); font-size:1rem; line-height:1.7;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  min-height:100vh; min-height:100dvh;
+  transition:background .4s var(--ease), color .4s var(--ease);
+}
+
+.sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.skip-link{ position:absolute; top:-100px; inset-inline-start:16px; padding:12px 20px; background:var(--blue-700); color:#fff; border-radius:0 0 12px 12px; font-weight:800; text-decoration:none; z-index:300; transition:top .2s var(--ease); }
+.skip-link:focus{ top:0; outline:3px solid var(--yellow-300); outline-offset:3px; }
+:focus-visible{ outline:none; box-shadow:var(--focus-ring); border-radius:var(--radius-md); }
+
+/* Loading */
+.loading-overlay{
+  position:fixed; inset:0; z-index:999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:18px; background:var(--bg);
+  transition:opacity .4s var(--ease), visibility .4s var(--ease);
+}
+.loading-overlay.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.loading-spinner{
+  width:56px; height:56px; border-radius:50%;
+  border:4px solid rgba(18,72,184,.15);
+  border-top-color:var(--blue-700);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.loading-text{ font-size:.95rem; font-weight:700; color:var(--ink-soft); }
+
+.app{ min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; }
+.app[hidden]{ display:none; }
+
+/* Header */
+.header{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--surface) 92%, transparent);
+  border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.header::before{
+  content:""; position:absolute; top:0; right:0; left:0; height:3px;
+  background:linear-gradient(90deg, var(--blue-700), var(--cyan-400), var(--yellow-500), var(--purple-600));
+  background-size:200% 100%;
+  animation:gradientShift 8s linear infinite;
+}
+@keyframes gradientShift{ 0%{ background-position:0% 50%; } 100%{ background-position:200% 50%; } }
+.header__inner{
+  max-width:1200px; margin:0 auto;
+  padding:12px clamp(16px, 3vmin, 32px);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+}
+.header__brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; border-radius:12px; padding:4px; }
+.header__logo{ width:44px; height:44px; flex-shrink:0; filter:drop-shadow(0 4px 12px rgba(18,72,184,.20)); }
+.header__brand-text{ display:flex; flex-direction:column; line-height:1.05; }
+.header__brand-ar{ font-size:1.25rem; font-weight:800; color:var(--blue-700); letter-spacing:-.01em; }
+[data-theme="dark"] .header__brand-ar{ color:var(--cyan-400); }
+.header__brand-en{ font-size:.62rem; font-weight:700; letter-spacing:.28em; color:var(--ink-soft); direction:ltr; }
+
+.header__user{ display:flex; align-items:center; gap:8px; }
+
+.ai-pill{
+  display:none; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:999px;
+  background:linear-gradient(135deg, rgba(139,92,246,.15), rgba(18,182,216,.15));
+  border:1.5px solid rgba(139,92,246,.35);
+  color:var(--purple-600); font-size:.74rem; font-weight:800;
+  cursor:pointer; font-family:inherit;
+  transition:all .3s var(--ease);
+}
+[data-theme="dark"] .ai-pill{ color:var(--purple-400); }
+.ai-pill:hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(139,92,246,.25); }
+.ai-pill svg{ width:14px; height:14px; animation:pulseSparkle 2.4s ease-in-out infinite; }
+@keyframes pulseSparkle{ 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.15); opacity:.7; } }
+@media (min-width:768px){ .ai-pill{ display:inline-flex; } }
+
+.header__icon-btn{
+  display:grid; place-items:center;
+  width:42px; height:42px;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  color:var(--ink);
+  cursor:pointer;
+  transition:all .25s var(--ease);
+}
+.header__icon-btn:hover{ border-color:var(--blue-700); color:var(--blue-700); background:rgba(18,72,184,.05); transform:translateY(-1px); }
+.header__icon-btn svg{ width:18px; height:18px; }
+.header__icon-btn .icon-moon{ display:block; }
+.header__icon-btn .icon-sun{ display:none; }
+[data-theme="dark"] .header__icon-btn .icon-moon{ display:none; }
+[data-theme="dark"] .header__icon-btn .icon-sun{ display:block; }
+
+/* User menu */
+.user-menu{ position:relative; }
+.user-menu__trigger{
+  display:flex; align-items:center; gap:10px;
+  padding:4px 10px 4px 4px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  cursor:pointer;
+  font-family:inherit;
+  color:var(--ink);
+  transition:all .25s var(--ease);
+  min-height:42px;
+}
+.user-menu__trigger:hover{ border-color:var(--blue-700); background:rgba(18,72,184,.04); }
+.user-menu__trigger[aria-expanded="true"]{ border-color:var(--blue-700); background:rgba(18,72,184,.06); }
+.user-menu__trigger-info{ display:none; flex-direction:column; line-height:1.1; text-align:right; padding:0 4px; }
+@media (min-width:640px){ .user-menu__trigger-info{ display:flex; } }
+.user-menu__trigger-name{ font-size:.82rem; font-weight:800; color:var(--ink); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.user-menu__trigger-role{ font-size:.68rem; font-weight:700; color:var(--ink-mute); }
+.user-menu__chevron{ width:14px; height:14px; color:var(--ink-mute); transition:transform .25s var(--ease); }
+.user-menu__trigger[aria-expanded="true"] .user-menu__chevron{ transform:rotate(180deg); }
+.header__user-avatar{
+  position:relative;
+  display:grid; place-items:center;
+  width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(135deg, var(--blue-700), var(--cyan-400));
+  color:#fff; font-weight:800; font-size:.9rem;
+  box-shadow:0 4px 12px rgba(18,72,184,.25);
+  flex-shrink:0;
+}
+.header__user-avatar::after{
+  content:""; position:absolute; bottom:-1px; right:-1px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--green-500); border:2px solid var(--surface);
+  box-shadow:0 0 8px rgba(22,163,74,.6);
+  animation:onlinePulse 2s ease-in-out infinite;
+}
+.user-menu__panel{
+  position:absolute; top:calc(100% + 10px); inset-inline-end:0;
+  width:min(340px, calc(100vw - 32px));
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:8px;
+  z-index:60;
+  animation:menuIn .22s var(--ease) both;
+}
+@keyframes menuIn{ from{ opacity:0; transform:translateY(-6px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
+.user-menu__panel[hidden]{ display:none; }
+.user-menu__header{ display:flex; align-items:center; gap:12px; padding:12px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+.user-menu__avatar{ display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg, var(--blue-700), var(--cyan-400)); color:#fff; font-weight:800; font-size:1rem; flex-shrink:0; }
+.user-menu__header-text{ min-width:0; flex:1; }
+.user-menu__name{ display:block; font-size:.95rem; font-weight:800; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.user-menu__email{ display:block; font-size:.78rem; color:var(--ink-mute); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:ltr; text-align:right; unicode-bidi:plaintext; }
+.user-menu__meta{ margin:0; padding:8px 12px; display:flex; flex-direction:column; gap:8px; border-bottom:1px solid var(--border); padding-bottom:14px; }
+.user-menu__meta-row{ display:flex; justify-content:space-between; align-items:center; font-size:.82rem; }
+.user-menu__meta-row dt{ color:var(--ink-mute); font-weight:700; margin:0; }
+.user-menu__meta-row dd{ margin:0; font-weight:800; color:var(--ink); }
+.badge{ display:inline-flex; align-items:center; gap:4px; padding:2px 10px; border-radius:999px; font-size:.72rem; font-weight:800; }
+.badge--success{ background:rgba(22,163,74,.12); color:var(--green-500); }
+[data-theme="dark"] .badge--success{ background:rgba(34,197,94,.18); color:#4ade80; }
+.badge--warn{ background:rgba(255,176,32,.15); color:#b87400; }
+[data-theme="dark"] .badge--warn{ background:rgba(255,176,32,.20); color:var(--yellow-500); }
+.user-menu__logout{
+  display:flex; align-items:center; gap:10px; width:100%;
+  margin-top:6px; padding:11px 12px;
+  border:none; border-radius:10px;
+  background:transparent;
+  color:var(--red-500);
+  font-family:inherit; font-size:.88rem; font-weight:800;
+  cursor:pointer;
+  transition:all .2s var(--ease);
+  text-align:right;
+}
+.user-menu__logout:hover{ background:rgba(220,38,38,.08); }
+.user-menu__logout svg{ width:16px; height:16px; }
+
+/* Main */
+.main{
+  flex:1; max-width:1200px; width:100%;
+  margin:0 auto;
+  padding:clamp(20px, 4vmin, 40px) clamp(16px, 3vmin, 32px) clamp(40px, 6vmin, 72px);
+}
+
+/* ============================================================
+   LIVE BAR — Phase 1 new
+   ============================================================ */
+.live-bar{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  margin-bottom:16px;
+  padding:12px 16px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  animation:cardIn .5s var(--ease-bounce) both;
+}
+.live-bar__greet{ display:flex; align-items:center; gap:10px; flex:1; min-width:200px; }
+.live-bar__greet-icon{
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg, var(--yellow-500), #f97316);
+  display:grid; place-items:center; color:#fff;
+  box-shadow:0 6px 14px rgba(255,176,32,.35);
+}
+.live-bar__greet-icon svg{ width:18px; height:18px; }
+.live-bar__greet-text{ display:flex; flex-direction:column; line-height:1.2; }
+.live-bar__greet-title{ font-weight:800; font-size:.92rem; color:var(--ink); }
+.live-bar__greet-sub{ font-size:.72rem; color:var(--ink-mute); font-weight:600; }
+.live-bar__pills{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.live-pill{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 10px; border-radius:999px;
+  background:var(--surface-soft); border:1.5px solid var(--border);
+  font-size:.72rem; font-weight:800; color:var(--ink-soft);
+}
+.live-pill svg{ width:12px; height:12px; }
+.live-pill--streak{ color:#c2410c; border-color:rgba(249,115,22,.35); background:rgba(249,115,22,.08); }
+[data-theme="dark"] .live-pill--streak{ color:#fb923c; background:rgba(249,115,22,.15); }
+.live-pill--streak svg{ animation:flame 1.6s ease-in-out infinite; }
+@keyframes flame{ 0%,100%{ transform:scale(1) rotate(-3deg); } 50%{ transform:scale(1.15) rotate(3deg); } }
+.live-pill--xp{ color:#7c3aed; border-color:rgba(124,58,237,.35); background:rgba(124,58,237,.08); }
+[data-theme="dark"] .live-pill--xp{ color:#a78bfa; background:rgba(124,58,237,.15); }
+.live-pill--clock{ direction:ltr; font-variant-numeric:tabular-nums; }
+
+/* ============================================================
+   PROFILE HERO — enhanced profile
+   ============================================================ */
+.profile-hero{
+  position:relative;
+  display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:center;
+  margin-bottom:16px;
+  padding:22px;
+  border-radius:var(--radius-2xl);
+  background:
+    radial-gradient(400px 200px at 0% 0%, rgba(139,92,246,.20), transparent 60%),
+    radial-gradient(400px 200px at 100% 100%, rgba(18,182,216,.20), transparent 60%),
+    linear-gradient(135deg, var(--surface), var(--surface-soft));
+  border:1.5px solid var(--border);
+  box-shadow:var(--shadow-md);
+  overflow:hidden;
+  animation:cardIn .6s var(--ease-bounce) both;
+}
+@media (max-width:640px){ .profile-hero{ grid-template-columns:1fr; text-align:center; } }
+.profile-hero::before{
+  content:""; position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(139,92,246,.10) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(18,182,216,.10) 1px, transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none; opacity:.6;
+}
+.profile-hero__avatar-wrap{ position:relative; z-index:1; }
+.profile-hero__avatar{
+  width:88px; height:88px; border-radius:24px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  display:grid; place-items:center;
+  color:#fff; font-size:2.2rem; font-weight:800;
+  box-shadow:0 16px 40px rgba(91,59,181,.35);
+  position:relative;
+  animation:floatAvatar 4s ease-in-out infinite;
+}
+@keyframes floatAvatar{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+.profile-hero__avatar::after{
+  content:""; position:absolute; inset:-6px; border-radius:30px;
+  border:2px solid rgba(139,92,246,.35);
+  animation:ringPulse 2.6s ease-out infinite;
+}
+.profile-hero__level-badge{
+  position:absolute; bottom:-6px; right:-6px;
+  padding:3px 9px; border-radius:999px;
+  background:linear-gradient(135deg, var(--yellow-500), #f97316);
+  color:#fff; font-size:.7rem; font-weight:800;
+  box-shadow:0 4px 12px rgba(255,176,32,.4);
+  white-space:nowrap;
+}
+.profile-hero__body{ position:relative; z-index:1; min-width:0; }
+.profile-hero__name{ margin:0 0 2px; font-size:1.3rem; font-weight:800; color:var(--ink); }
+.profile-hero__tagline{ margin:0 0 12px; font-size:.82rem; color:var(--ink-soft); font-weight:600; }
+.profile-hero__stats{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));
+  gap:10px;
+}
+.profile-stat{
+  display:flex; flex-direction:column; gap:2px;
+  padding:10px 12px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  text-align:center;
+  transition:transform .25s var(--ease);
+}
+.profile-stat:hover{ transform:translateY(-2px); border-color:var(--purple-400); }
+.profile-stat__value{
+  font-size:1.15rem; font-weight:800;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  line-height:1;
+}
+.profile-stat__label{ font-size:.68rem; font-weight:700; color:var(--ink-mute); }
+.profile-hero__xp{
+  margin-top:12px;
+  padding:8px 12px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+}
+.profile-hero__xp-label{
+  display:flex; justify-content:space-between;
+  font-size:.7rem; font-weight:800; color:var(--ink-mute); margin-bottom:6px;
+}
+.profile-hero__xp-value{ color:var(--purple-600); }
+[data-theme="dark"] .profile-hero__xp-value{ color:var(--purple-400); }
+.xp-track{ height:8px; border-radius:999px; background:rgba(124,58,237,.12); overflow:hidden; }
+.xp-fill{
+  height:100%; border-radius:999px;
+  background:linear-gradient(90deg, var(--purple-600), var(--cyan-500), var(--yellow-500));
+  background-size:200% 100%;
+  animation:gradientShift 3s linear infinite;
+  transition:width 1.2s var(--ease-bounce);
+  box-shadow:0 0 12px rgba(139,92,246,.5);
+}
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+.achievements-strip{
+  display:flex; gap:8px; flex-wrap:wrap;
+  margin-bottom:16px;
+  padding:12px 14px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  animation:cardIn .55s var(--ease-bounce) both;
+}
+.achievement{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:999px;
+  background:linear-gradient(135deg, rgba(255,176,32,.15), rgba(249,115,22,.10));
+  border:1.5px solid rgba(255,176,32,.35);
+  font-size:.72rem; font-weight:800; color:#b45309;
+  transition:transform .2s var(--ease);
+}
+[data-theme="dark"] .achievement{ color:var(--yellow-300); }
+.achievement:hover{ transform:scale(1.05); }
+.achievement svg{ width:14px; height:14px; }
+.achievement--locked{ opacity:.4; filter:grayscale(1); }
+.achievement--locked:hover{ transform:none; }
+
+/* ============================================================
+   QUICK DOCK
+   ============================================================ */
+.quick-dock{
+  position:sticky; top:80px; z-index:45;
+  margin-bottom:16px;
+  padding:10px 12px;
+  background:color-mix(in srgb, var(--surface) 90%, transparent);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  display:flex; align-items:center; gap:8px;
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+.quick-dock::-webkit-scrollbar{ height:4px; }
+.quick-dock::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:999px; }
+.quick-dock__label{
+  display:flex; align-items:center; gap:6px;
+  flex-shrink:0;
+  padding-inline-end:8px;
+  border-inline-end:1px solid var(--border);
+  font-size:.72rem; font-weight:800; color:var(--ink-mute);
+}
+.quick-dock__label svg{ width:14px; height:14px; }
+.quick-dock__item{
+  flex-shrink:0;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:999px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  font-family:inherit; font-size:.76rem; font-weight:800;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .2s var(--ease);
+  white-space:nowrap;
+}
+.quick-dock__item:hover{ transform:translateY(-2px); border-color:var(--blue-700); color:var(--blue-700); box-shadow:0 4px 12px rgba(18,72,184,.15); }
+.quick-dock__item svg{ width:14px; height:14px; }
+.quick-dock__item--active{ background:linear-gradient(135deg,var(--blue-700),var(--cyan-500)); color:#fff; border-color:transparent; }
+
+/* ============================================================
+   ACTIVITY TICKER
+   ============================================================ */
+.activity-ticker{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 14px;
+  margin-bottom:16px;
+  background:var(--surface-soft);
+  border:1.5px dashed var(--border-strong);
+  border-radius:999px;
+  overflow:hidden;
+  font-size:.76rem; font-weight:700; color:var(--ink-soft);
+}
+.activity-ticker__dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--green-500);
+  box-shadow:0 0 10px var(--green-500);
+  flex-shrink:0;
+  animation:onlinePulse 1.5s ease-in-out infinite;
+}
+.activity-ticker__text{ flex:1; min-width:0; }
+.activity-ticker__msg{ animation:tickerIn .6s var(--ease-bounce); display:block; }
+@keyframes tickerIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+.activity-ticker__badge{ display:flex; align-items:center; gap:4px; font-size:.7rem; color:var(--ink-mute); }
+
+/* ============================================================
+   Intro Hero
+   ============================================================ */
+.intro{
+  position:relative;
+  padding:clamp(24px, 4vmin, 44px);
+  border-radius:var(--radius-2xl);
+  background:
+    radial-gradient(700px 400px at 100% 0%, rgba(42,212,232,.22), transparent 60%),
+    radial-gradient(600px 400px at 0% 100%, rgba(255,176,32,.16), transparent 55%),
+    linear-gradient(135deg, #0b2b6b 0%, #0e3490 45%, #103a9c 100%);
+  color:#fff;
+  overflow:hidden;
+  margin-bottom:clamp(20px, 4vmin, 36px);
+  box-shadow:0 24px 60px rgba(11,43,107,.28);
+  isolation:isolate;
+}
+.intro::before{
+  content:""; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:36px 36px;
+  mask-image:radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  pointer-events:none; z-index:0;
+}
+.intro__orb{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.55; pointer-events:none; z-index:0; }
+.intro__orb--1{ width:340px; height:340px; background:#12b6d8; top:-120px; right:-80px; animation:float1 9s ease-in-out infinite; }
+.intro__orb--2{ width:280px; height:280px; background:#ffb020; bottom:-120px; left:-60px; animation:float2 11s ease-in-out infinite; }
+.intro__orb--3{ width:200px; height:200px; background:#5b3bb5; top:40%; left:35%; opacity:.35; animation:float1 13s ease-in-out infinite reverse; }
+@keyframes float1{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(30px,-40px) scale(1.05); } }
+@keyframes float2{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-30px,30px) scale(1.08); } }
+.intro__inner{ position:relative; z-index:1; }
+.intro__badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:999px;
+  font-size:.76rem; font-weight:700; color:#e8f4ff;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  margin-bottom:14px;
+}
+.intro__badge svg{ width:13px; height:13px; color:var(--yellow-300); }
+.intro__title{ margin:0 0 10px; font-size:clamp(1.4rem, 3.2vmin, 2.1rem); font-weight:800; line-height:1.3; color:#fff; }
+.intro__title-accent{ background:linear-gradient(135deg, #2ad4e8, #ffd86b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.intro__desc{ margin:0; font-size:.94rem; color:rgba(255,255,255,.88); line-height:1.7; max-width:56ch; }
+.intro__stats{
+  display:flex; gap:clamp(18px, 4vmin, 40px); flex-wrap:wrap;
+  margin-top:22px; padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.16);
+}
+.intro__stat{ display:flex; flex-direction:column; gap:2px; }
+.intro__stat-value{
+  font-size:clamp(1.25rem, 2.6vmin, 1.6rem); font-weight:800;
+  background:linear-gradient(135deg, #2ad4e8, #ffd86b);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  line-height:1;
+}
+.intro__stat-label{ font-size:.74rem; font-weight:700; color:rgba(255,255,255,.78); }
+
+/* AI Showcase */
+.ai-showcase{
+  position:relative;
+  margin-bottom:clamp(20px, 4vmin, 36px);
+  padding:clamp(20px, 3vmin, 32px);
+  border-radius:var(--radius-2xl);
+  background:
+    radial-gradient(500px 300px at 90% 10%, rgba(139,92,246,.20), transparent 60%),
+    radial-gradient(500px 300px at 10% 90%, rgba(18,182,216,.20), transparent 60%),
+    linear-gradient(135deg, rgba(91,59,181,.06), rgba(18,182,216,.06));
+  border:1.5px solid rgba(139,92,246,.22);
+  box-shadow:0 12px 40px rgba(91,59,181,.10);
+  overflow:hidden;
+}
+[data-theme="dark"] .ai-showcase{
+  background:
+    radial-gradient(500px 300px at 90% 10%, rgba(139,92,246,.14), transparent 60%),
+    radial-gradient(500px 300px at 10% 90%, rgba(18,182,216,.14), transparent 60%),
+    linear-gradient(135deg, rgba(91,59,181,.14), rgba(18,182,216,.10));
+  border-color:rgba(139,92,246,.35);
+}
+.ai-showcase::before{
+  content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+  background:conic-gradient(from 0deg, transparent, rgba(139,92,246,.10), transparent, rgba(18,182,216,.10), transparent);
+  animation:rotateGlow 18s linear infinite;
+  pointer-events:none;
+}
+@keyframes rotateGlow{ to{ transform:rotate(360deg); } }
+.ai-showcase__inner{ position:relative; z-index:1; }
+.ai-showcase__head{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  margin-bottom:20px; flex-wrap:wrap;
+}
+.ai-showcase__title-wrap{ display:flex; align-items:center; gap:14px; }
+.ai-showcase__icon{
+  width:48px; height:48px; border-radius:14px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  display:grid; place-items:center;
+  color:#fff;
+  box-shadow:0 10px 24px rgba(91,59,181,.35);
+  position:relative;
+}
+.ai-showcase__icon svg{ width:24px; height:24px; }
+.ai-showcase__icon::after{
+  content:""; position:absolute; inset:-4px;
+  border-radius:16px;
+  border:2px solid rgba(139,92,246,.4);
+  animation:ringPulse 2.4s ease-out infinite;
+}
+@keyframes ringPulse{
+  0%{ transform:scale(1); opacity:.8; }
+  100%{ transform:scale(1.4); opacity:0; }
+}
+.ai-showcase__title{ margin:0 0 2px; font-size:clamp(1.1rem, 2.4vmin, 1.35rem); font-weight:800; color:var(--ink); }
+.ai-showcase__subtitle{ margin:0; font-size:.82rem; color:var(--ink-soft); font-weight:600; }
+.ai-showcase__badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:999px;
+  background:linear-gradient(135deg, rgba(139,92,246,.15), rgba(18,182,216,.15));
+  border:1.5px solid rgba(139,92,246,.35);
+  color:var(--purple-600); font-size:.72rem; font-weight:800;
+}
+[data-theme="dark"] .ai-showcase__badge{ color:var(--purple-400); }
+.ai-showcase__badge::before{
+  content:""; width:6px; height:6px; border-radius:50%;
+  background:var(--green-500); box-shadow:0 0 8px var(--green-500);
+  animation:onlinePulse 1.6s ease-in-out infinite;
+}
+@keyframes onlinePulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.5; transform:scale(1.3); } }
+
+.ai-tools-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+  gap:12px;
+}
+@media (max-width:520px){ .ai-tools-grid{ grid-template-columns:repeat(2, 1fr); } }
+
+.ai-tool{
+  position:relative;
+  display:flex; flex-direction:column; gap:8px;
+  padding:14px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  cursor:pointer;
+  text-align:right;
+  font-family:inherit;
+  color:var(--ink);
+  overflow:hidden;
+  transition:all .3s var(--ease);
+  animation:cardIn .5s var(--ease-bounce) both;
+  animation-delay:calc(var(--ti,0) * 50ms);
+}
+.ai-tool:hover{
+  border-color:var(--purple-400);
+  transform:translateY(-3px);
+  box-shadow:0 14px 30px rgba(139,92,246,.20);
+}
+.ai-tool::before{
+  content:""; position:absolute; top:0; right:0; bottom:0; width:3px;
+  background:linear-gradient(180deg, var(--purple-600), var(--cyan-500));
+  transform:scaleY(0); transform-origin:top;
+  transition:transform .3s var(--ease);
+}
+.ai-tool:hover::before{ transform:scaleY(1); }
+.ai-tool__icon{
+  width:34px; height:34px; border-radius:10px;
+  display:grid; place-items:center;
+  background:linear-gradient(135deg, rgba(139,92,246,.14), rgba(18,182,216,.14));
+  color:var(--purple-600);
+}
+[data-theme="dark"] .ai-tool__icon{ color:var(--purple-400); }
+.ai-tool__icon svg{ width:17px; height:17px; }
+.ai-tool__title{ font-size:.82rem; font-weight:800; color:var(--ink); line-height:1.3; }
+.ai-tool__desc{ font-size:.68rem; color:var(--ink-mute); font-weight:600; line-height:1.4; }
+
+/* Continue banner */
+.continue-banner{
+  margin-bottom:20px;
+  border-radius:var(--radius-xl);
+  background:linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border:1.5px solid rgba(18,182,216,.35);
+  box-shadow:0 8px 24px rgba(18,182,216,.12);
+  overflow:hidden;
+  animation:cardIn .5s var(--ease-bounce) both;
+}
+[data-theme="dark"] .continue-banner{
+  background:linear-gradient(135deg, rgba(18,182,216,.14), rgba(91,59,181,.10));
+  border-color:rgba(42,212,232,.28);
+}
+.continue-banner[hidden]{ display:none; }
+.continue-banner__inner{ display:flex; align-items:center; gap:14px; padding:14px 18px; flex-wrap:wrap; }
+.continue-banner__icon{
+  display:grid; place-items:center;
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(135deg, var(--cyan-500), var(--blue-600));
+  color:#fff; flex-shrink:0;
+  box-shadow:0 8px 18px rgba(18,182,216,.30);
+}
+.continue-banner__icon svg{ width:22px; height:22px; }
+.continue-banner__text{ flex:1; min-width:140px; }
+.continue-banner__label{ display:block; font-size:.72rem; font-weight:800; color:var(--ink-mute); }
+.continue-banner__title{ margin:0; font-size:.98rem; font-weight:800; color:var(--ink); line-height:1.3; }
+.continue-banner__btn{
+  padding:10px 20px;
+  background:linear-gradient(135deg, var(--blue-700), var(--cyan-500));
+  color:#fff; font-family:inherit; font-size:.85rem; font-weight:800;
+  border:none; border-radius:var(--radius-md);
+  cursor:pointer;
+  transition:all .25s var(--ease);
+  box-shadow:0 6px 16px rgba(18,72,184,.30);
+}
+.continue-banner__btn:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(18,72,184,.40); }
+
+/* Toolbar */
+.toolbar{ display:flex; flex-direction:column; gap:14px; margin-bottom:22px; }
+@media (min-width:768px){ .toolbar{ flex-direction:row; align-items:center; justify-content:space-between; } }
+.search{ position:relative; flex:1; max-width:420px; }
+.search svg.search-icon{ position:absolute; top:50%; inset-inline-start:14px; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-mute); pointer-events:none; }
+.search input{
+  width:100%; padding:13px 46px 13px 60px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-md);
+  font-family:inherit; font-size:.9rem; font-weight:600;
+  color:var(--ink);
+  transition:all .25s var(--ease);
+  outline:none;
+}
+.search input::placeholder{ color:var(--ink-mute); }
+.search input:focus{ border-color:var(--blue-700); box-shadow:0 0 0 4px rgba(18,72,184,.12); }
+.search kbd{
+  position:absolute; top:50%; inset-inline-end:14px;
+  transform:translateY(-50%);
+  padding:2px 6px; border-radius:6px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  font-family:ui-monospace,monospace;
+  font-size:.72rem; font-weight:700;
+  color:var(--ink-mute); pointer-events:none;
+}
+.toolbar__right{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.sort-wrap{ position:relative; display:inline-flex; align-items:center; }
+.sort-wrap svg{ position:absolute; inset-inline-start:12px; width:16px; height:16px; color:var(--ink-mute); pointer-events:none; }
+.sort-select{
+  appearance:none; -webkit-appearance:none;
+  padding:11px 16px 11px 40px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-md);
+  font-family:inherit; font-size:.85rem; font-weight:700;
+  color:var(--ink); cursor:pointer;
+  outline:none;
+  transition:all .25s var(--ease);
+}
+.sort-select:focus{ border-color:var(--blue-700); box-shadow:0 0 0 4px rgba(18,72,184,.12); }
+
+.filters{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:9px 16px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  font-family:inherit; font-size:.82rem; font-weight:800;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .25s var(--ease);
+}
+.chip svg{ width:14px; height:14px; }
+.chip:hover{ border-color:var(--blue-700); color:var(--blue-700); transform:translateY(-1px); }
+.chip[aria-pressed="true"]{
+  background:linear-gradient(135deg, var(--blue-700), var(--blue-600));
+  color:#fff; border-color:transparent;
+  box-shadow:0 6px 16px rgba(18,72,184,.30);
+}
+.chip__count{ padding:1px 7px; border-radius:999px; background:rgba(0,0,0,.08); font-size:.7rem; font-weight:800; }
+.chip[aria-pressed="true"] .chip__count{ background:rgba(255,255,255,.25); }
+
+/* Section title */
+.section-title{
+  margin:24px 0 18px;
+  font-size:1.15rem; font-weight:800; color:var(--ink);
+  display:flex; align-items:center; gap:10px;
+}
+.section-title__icon{
+  flex-shrink:0; width:34px; height:34px;
+  border-radius:10px;
+  background:linear-gradient(135deg, var(--blue-700), var(--cyan-500));
+  color:#fff;
+  display:grid; place-items:center;
+  box-shadow:0 6px 14px rgba(18,72,184,.25);
+}
+.section-title__icon svg{ width:18px; height:18px; }
+.section-title__count{
+  margin-inline-start:auto;
+  padding:4px 12px;
+  border-radius:999px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  font-size:.78rem; font-weight:800;
+  color:var(--ink-soft);
+}
+
+/* Courses grid */
+.courses-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:18px;
+  margin-bottom:clamp(28px, 4vmin, 44px);
+}
+
+.course-card{
+  position:relative;
+  display:flex; flex-direction:column;
+  gap:14px;
+  padding:22px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-xl);
+  text-align:right;
+  color:var(--ink);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+  animation:cardIn .55s var(--ease-bounce) both;
+  animation-delay:calc(var(--i, 0) * 45ms);
+}
+@keyframes cardIn{
+  from{ opacity:0; transform:translateY(16px) scale(.97); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+.course-card::before{
+  content:""; position:absolute;
+  top:0; right:0; width:4px; height:100%;
+  background:linear-gradient(180deg, var(--card-c1, var(--blue-700)), var(--card-c2, var(--cyan-500)));
+  transform:scaleY(0); transform-origin:top;
+  transition:transform .3s var(--ease);
+  z-index:0;
+}
+.course-card:hover{
+  border-color:var(--border-strong);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-glow);
+}
+.course-card:hover::before{ transform:scaleY(1); }
+.course-card[hidden]{ display:none; }
+
+.course-card__title-link{ color:inherit; text-decoration:none; transition:color .25s var(--ease); }
+.course-card__title-link::after{ content:""; position:absolute; inset:0; z-index:1; border-radius:inherit; cursor:pointer; }
+.course-card__title-link:focus-visible{ outline:none; }
+.course-card:has(.course-card__title-link:focus-visible){ outline:none; box-shadow:var(--focus-ring); }
+
+.bookmark-btn{
+  position:absolute;
+  top:14px; left:14px;
+  width:36px; height:36px;
+  border-radius:50%;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  display:grid; place-items:center;
+  color:var(--ink-mute);
+  cursor:pointer;
+  z-index:2;
+  transition:all .25s var(--ease);
+}
+.bookmark-btn:hover{ border-color:var(--yellow-500); color:var(--yellow-500); background:rgba(255,176,32,.08); transform:scale(1.08); }
+.bookmark-btn svg{ width:16px; height:16px; transition:fill .25s var(--ease); }
+.bookmark-btn[aria-pressed="true"]{ border-color:var(--yellow-500); color:var(--yellow-500); background:rgba(255,176,32,.12); }
+.bookmark-btn[aria-pressed="true"] svg{ fill:currentColor; }
+
+.course-card__top{ display:flex; align-items:flex-start; gap:10px; position:relative; z-index:0; }
+.course-card__icon{
+  display:grid; place-items:center;
+  width:56px; height:56px;
+  border-radius:16px;
+  color:#fff; flex-shrink:0;
+  background:linear-gradient(135deg, var(--card-c1, var(--blue-700)), var(--card-c2, var(--cyan-500)));
+  box-shadow:0 10px 22px var(--card-shadow, rgba(18,72,184,.25));
+  transition:transform .35s var(--ease-bounce);
+}
+.course-card:hover .course-card__icon{ transform:rotate(-6deg) scale(1.05); }
+.course-card__icon svg{ width:28px; height:28px; }
+
+.course-card__level{
+  font-size:.7rem; font-weight:800;
+  padding:4px 10px; border-radius:999px;
+  border:1.5px solid currentColor;
+  white-space:nowrap;
+  align-self:flex-start;
+  margin-top:8px;
+  position:relative; z-index:0;
+}
+.level--beginner{ color:var(--green-500); }
+.level--intermediate{ color:#b87400; }
+[data-theme="dark"] .level--intermediate{ color:var(--yellow-500); }
+.level--advanced{ color:var(--red-500); }
+
+.course-card__title{
+  margin:0;
+  font-size:1.12rem; font-weight:800;
+  color:var(--ink); line-height:1.3;
+  position:relative; z-index:0;
+}
+.course-card__desc{
+  margin:0;
+  font-size:.85rem; color:var(--ink-soft);
+  line-height:1.6; flex:1;
+  position:relative; z-index:0;
+}
+.course-card__teacher{
+  display:flex; align-items:center; gap:8px;
+  font-size:.8rem; font-weight:700; color:var(--ink-soft);
+  position:relative; z-index:0;
+}
+.teacher-avatar{
+  display:grid; place-items:center;
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg, var(--purple-600), var(--purple-400));
+  color:#fff; font-size:.72rem; font-weight:800;
+  flex-shrink:0;
+}
+
+.course-card__progress{
+  display:flex; flex-direction:column; gap:6px;
+  padding-top:12px;
+  border-top:1px dashed var(--border);
+  position:relative; z-index:0;
+}
+.progress-label{ display:flex; justify-content:space-between; font-size:.72rem; font-weight:700; color:var(--ink-mute); }
+.progress-value{ color:var(--blue-700); font-weight:800; }
+[data-theme="dark"] .progress-value{ color:var(--cyan-400); }
+.progress-track{ height:6px; border-radius:999px; background:rgba(18,72,184,.10); overflow:hidden; }
+[data-theme="dark"] .progress-track{ background:rgba(255,255,255,.10); }
+.progress-fill{
+  height:100%; border-radius:999px;
+  background:linear-gradient(90deg, var(--card-c1, var(--blue-700)), var(--card-c2, var(--cyan-500)));
+  box-shadow:0 0 10px var(--card-shadow, rgba(18,182,216,.4));
+  transition:width 1.2s var(--ease-bounce);
+}
+
+.course-card__meta{
+  display:flex; align-items:center; gap:12px;
+  font-size:.72rem; font-weight:700;
+  color:var(--ink-mute);
+  flex-wrap:wrap;
+  position:relative; z-index:0;
+}
+.course-card__meta span{ display:inline-flex; align-items:center; gap:4px; }
+.course-card__meta svg{ width:13px; height:13px; }
+.course-card__meta .star{ color:#c47b00; }
+[data-theme="dark"] .course-card__meta .star{ color:var(--yellow-500); }
+
+.course-card[data-progress="0"] .progress-value{ color:var(--ink-mute); }
+
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;
+  padding:60px 20px;
+  color:var(--ink-mute);
+  font-weight:700;
+}
+.empty-state svg{ width:56px; height:56px; opacity:.4; margin-bottom:12px; }
+.empty-state p{ margin:0 0 16px; font-size:1rem; }
+.empty-state__btn{
+  padding:10px 22px;
+  background:var(--blue-700); color:#fff;
+  border:none; border-radius:var(--radius-md);
+  font-family:inherit; font-size:.85rem; font-weight:800;
+  cursor:pointer;
+  transition:all .25s var(--ease);
+}
+.empty-state__btn:hover{ background:var(--blue-600); transform:translateY(-1px); }
+
+.back-to-top{
+  position:fixed; bottom:24px; left:24px; z-index:40;
+  width:48px; height:48px;
+  border-radius:50%;
+  background:linear-gradient(135deg, var(--blue-700), var(--cyan-500));
+  color:#fff;
+  border:none; cursor:pointer;
+  display:grid; place-items:center;
+  box-shadow:0 10px 26px rgba(18,72,184,.35);
+  transform:translateY(80px); opacity:0; visibility:hidden;
+  transition:all .3s var(--ease-bounce);
+}
+.back-to-top.is-visible{ transform:translateY(0); opacity:1; visibility:visible; }
+.back-to-top:hover{ transform:translateY(-3px) scale(1.05); }
+.back-to-top svg{ width:22px; height:22px; }
+
+/* ============================================================
+   AI FAB & Panel
+   ============================================================ */
+.ai-fab{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  z-index:95;
+  width:64px; height:64px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+  cursor:pointer;
+  display:grid; place-items:center;
+  box-shadow:0 12px 32px rgba(91,59,181,.45), 0 0 0 0 rgba(139,92,246,.5);
+  animation:fabPulse 2.8s ease-in-out infinite;
+  transition:transform .3s var(--ease-bounce);
+}
+.ai-fab:hover{ transform:scale(1.08) rotate(6deg); }
+.ai-fab:active{ transform:scale(.96); }
+.ai-fab svg{ width:30px; height:30px; position:relative; z-index:1; }
+.ai-fab::before{
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 0deg, transparent, rgba(255,255,255,.5), transparent);
+  animation:rotateGlow 4s linear infinite;
+  opacity:.7;
+}
+.ai-fab::after{
+  content:""; position:absolute; inset:-6px; border-radius:50%;
+  border:2px solid rgba(139,92,246,.4);
+  animation:ringPulse 2.4s ease-out infinite;
+}
+@keyframes fabPulse{
+  0%,100%{ box-shadow:0 12px 32px rgba(91,59,181,.45), 0 0 0 0 rgba(139,92,246,.5); }
+  50%{ box-shadow:0 12px 32px rgba(91,59,181,.55), 0 0 0 14px rgba(139,92,246,0); }
+}
+.ai-fab[aria-expanded="true"]{ transform:rotate(45deg); }
+.ai-fab__label{
+  position:absolute; right:calc(100% + 12px); top:50%; transform:translateY(-50%);
+  background:var(--ink); color:#fff;
+  padding:6px 12px; border-radius:8px;
+  font-size:.78rem; font-weight:800;
+  white-space:nowrap;
+  opacity:0; pointer-events:none;
+  transition:opacity .2s var(--ease);
+}
+.ai-fab:hover .ai-fab__label{ opacity:1; }
+
+.ai-panel{
+  position:fixed;
+  bottom:100px;
+  right:24px;
+  z-index:94;
+  width:min(480px, calc(100vw - 32px));
+  height:min(760px, calc(100vh - 140px));
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-2xl);
+  box-shadow:var(--shadow-lg);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  transform-origin:bottom right;
+  animation:panelIn .4s var(--ease-bounce) both;
+}
+@keyframes panelIn{ from{ opacity:0; transform:scale(.85) translateY(20px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+.ai-panel[hidden]{ display:none; }
+
+.ai-panel__header{
+  display:flex; align-items:center; gap:12px;
+  padding:16px 18px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.ai-panel__header::before{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(circle at 80% 20%, rgba(255,255,255,.20), transparent 50%);
+  pointer-events:none;
+}
+.ai-panel__avatar{
+  width:40px; height:40px; border-radius:12px;
+  background:rgba(255,255,255,.20);
+  display:grid; place-items:center;
+  flex-shrink:0;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.30);
+  position:relative;
+}
+.ai-panel__avatar svg{ width:22px; height:22px; }
+.ai-panel__avatar::after{
+  content:""; position:absolute; bottom:-2px; right:-2px;
+  width:12px; height:12px; border-radius:50%;
+  background:#4ade80; border:2px solid var(--purple-600);
+  animation:onlinePulse 1.6s ease-in-out infinite;
+}
+.ai-panel__head-text{ flex:1; min-width:0; position:relative; z-index:1; }
+.ai-panel__title{ margin:0 0 2px; font-size:1rem; font-weight:800; }
+.ai-panel__status{ font-size:.72rem; opacity:.9; display:flex; align-items:center; gap:6px; }
+.ai-panel__status::before{
+  content:""; width:6px; height:6px; border-radius:50%;
+  background:#4ade80; box-shadow:0 0 8px #4ade80;
+  animation:onlinePulse 1.6s ease-in-out infinite;
+}
+.ai-panel__close{
+  width:34px; height:34px; border-radius:10px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;
+  cursor:pointer;
+  display:grid; place-items:center;
+  transition:all .2s var(--ease);
+  position:relative; z-index:1;
+}
+.ai-panel__close:hover{ background:rgba(255,255,255,.30); transform:rotate(90deg); }
+.ai-panel__close svg{ width:16px; height:16px; }
+
+.ai-tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  background:var(--surface-soft);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.ai-tabs::-webkit-scrollbar{ display:none; }
+.ai-tab{
+  flex:0 0 auto;
+  padding:12px 14px;
+  background:transparent;
+  border:none;
+  border-bottom:2.5px solid transparent;
+  color:var(--ink-mute);
+  font-family:inherit; font-size:.76rem; font-weight:800;
+  cursor:pointer;
+  transition:all .25s var(--ease);
+  display:flex; align-items:center; gap:5px;
+  white-space:nowrap;
+}
+.ai-tab svg{ width:13px; height:13px; }
+.ai-tab:hover{ color:var(--purple-600); background:rgba(139,92,246,.05); }
+[data-theme="dark"] .ai-tab:hover{ color:var(--purple-400); }
+.ai-tab[aria-selected="true"]{
+  color:var(--purple-600);
+  border-bottom-color:var(--purple-600);
+  background:var(--surface);
+}
+[data-theme="dark"] .ai-tab[aria-selected="true"]{ color:var(--purple-400); border-bottom-color:var(--purple-400); }
+
+.ai-body{
+  flex:1;
+  overflow-y:auto;
+  display:flex; flex-direction:column;
+  background:var(--surface);
+}
+
+/* AI Chat */
+.ai-chat{
+  display:flex; flex-direction:column;
+  height:100%;
+}
+.ai-chat__messages{
+  flex:1;
+  padding:18px;
+  display:flex; flex-direction:column; gap:12px;
+  overflow-y:auto;
+  scroll-behavior:smooth;
+}
+.ai-msg{
+  display:flex; gap:10px;
+  max-width:88%;
+  animation:msgIn .35s var(--ease-bounce) both;
+}
+@keyframes msgIn{ from{ opacity:0; transform:translateY(10px) scale(.95); } to{ opacity:1; transform:translateY(0) scale(1); } }
+.ai-msg--user{ align-self:flex-end; flex-direction:row-reverse; }
+.ai-msg__avatar{
+  width:32px; height:32px; border-radius:50%;
+  display:grid; place-items:center;
+  flex-shrink:0;
+  font-size:.8rem; font-weight:800;
+}
+.ai-msg--bot .ai-msg__avatar{
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+}
+.ai-msg--user .ai-msg__avatar{
+  background:linear-gradient(135deg, var(--blue-700), var(--cyan-400));
+  color:#fff;
+}
+.ai-msg__bubble{
+  padding:10px 14px;
+  border-radius:16px;
+  font-size:.85rem;
+  line-height:1.6;
+  font-weight:600;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.ai-msg--bot .ai-msg__bubble{
+  background:var(--surface-soft);
+  border:1px solid var(--border);
+  color:var(--ink);
+  border-bottom-right-radius:4px;
+}
+.ai-msg--user .ai-msg__bubble{
+  background:linear-gradient(135deg, var(--blue-700), var(--blue-600));
+  color:#fff;
+  border-bottom-left-radius:4px;
+}
+
+/* Thinking steps */
+.ai-thinking{
+  padding:10px 14px;
+  background:linear-gradient(135deg, rgba(139,92,246,.08), rgba(18,182,216,.08));
+  border:1.5px dashed rgba(139,92,246,.30);
+  border-radius:12px;
+  font-size:.78rem;
+  color:var(--ink-soft);
+  display:flex; flex-direction:column; gap:6px;
+  animation:msgIn .35s var(--ease-bounce) both;
+}
+.ai-thinking__title{
+  display:flex; align-items:center; gap:6px;
+  font-weight:800; color:var(--purple-600);
+  font-size:.76rem;
+}
+[data-theme="dark"] .ai-thinking__title{ color:var(--purple-400); }
+.ai-thinking__title svg{ width:13px; height:13px; animation:pulseSparkle 1.6s ease-in-out infinite; }
+.ai-thinking__step{
+  display:flex; align-items:center; gap:6px;
+  opacity:0;
+  animation:stepFadeIn .35s var(--ease) forwards;
+}
+.ai-thinking__step::before{
+  content:"✓"; color:var(--green-500); font-weight:800;
+}
+@keyframes stepFadeIn{ to{ opacity:1; } }
+
+.ai-typing{
+  display:inline-flex; gap:4px;
+  padding:12px 16px;
+}
+.ai-typing span{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--ink-mute);
+  animation:typingBounce 1.4s ease-in-out infinite;
+}
+.ai-typing span:nth-child(2){ animation-delay:.2s; }
+.ai-typing span:nth-child(3){ animation-delay:.4s; }
+@keyframes typingBounce{ 0%,60%,100%{ transform:translateY(0); opacity:.5; } 30%{ transform:translateY(-8px); opacity:1; } }
+
+/* Follow-up suggestions */
+.ai-followups{
+  display:flex; gap:6px; flex-wrap:wrap;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px dashed var(--border);
+}
+.ai-followup{
+  padding:5px 10px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  font-family:inherit; font-size:.7rem; font-weight:700;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .2s var(--ease);
+}
+.ai-followup:hover{
+  border-color:var(--purple-400); color:var(--purple-600); background:rgba(139,92,246,.05);
+}
+[data-theme="dark"] .ai-followup:hover{ color:var(--purple-400); }
+
+.ai-chat__suggestions{
+  display:flex; gap:8px; flex-wrap:wrap;
+  padding:0 18px 12px;
+}
+.ai-suggestion{
+  padding:7px 12px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  font-family:inherit; font-size:.74rem; font-weight:700;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .2s var(--ease);
+}
+.ai-suggestion:hover{
+  border-color:var(--purple-400);
+  color:var(--purple-600);
+  background:rgba(139,92,246,.06);
+  transform:translateY(-1px);
+}
+[data-theme="dark"] .ai-suggestion:hover{ color:var(--purple-400); }
+
+.ai-chat__input-wrap{
+  padding:12px 14px;
+  border-top:1px solid var(--border);
+  background:var(--surface);
+  display:flex; gap:8px; align-items:flex-end;
+}
+.ai-mic-btn{
+  width:44px; height:44px; border-radius:12px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  color:var(--ink-soft);
+  cursor:pointer;
+  display:grid; place-items:center;
+  flex-shrink:0;
+  transition:all .2s var(--ease);
+}
+.ai-mic-btn:hover{ border-color:var(--purple-400); color:var(--purple-600); }
+.ai-mic-btn.is-recording{ background:rgba(220,38,38,.10); border-color:var(--red-500); color:var(--red-500); animation:micPulse 1s ease-in-out infinite; }
+@keyframes micPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.5); } 50%{ box-shadow:0 0 0 8px rgba(220,38,38,0); } }
+.ai-mic-btn svg{ width:18px; height:18px; }
+.ai-chat__input{
+  flex:1;
+  padding:11px 14px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  font-family:inherit; font-size:.88rem; font-weight:600;
+  color:var(--ink);
+  resize:none;
+  outline:none;
+  max-height:100px;
+  min-height:44px;
+  transition:all .2s var(--ease);
+  line-height:1.5;
+}
+.ai-chat__input:focus{ border-color:var(--purple-400); background:var(--surface); }
+.ai-chat__send{
+  width:44px; height:44px; border-radius:12px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  display:grid; place-items:center;
+  flex-shrink:0;
+  transition:all .25s var(--ease-bounce);
+  box-shadow:0 6px 16px rgba(91,59,181,.30);
+}
+.ai-chat__send:hover:not(:disabled){ transform:scale(1.08) rotate(-6deg); }
+.ai-chat__send:disabled{ opacity:.5; cursor:not-allowed; }
+.ai-chat__send svg{ width:18px; height:18px; }
+
+/* AI pane */
+.ai-pane{ padding:18px; display:flex; flex-direction:column; gap:14px; }
+.ai-pane__intro{
+  padding:12px 14px;
+  background:linear-gradient(135deg, rgba(139,92,246,.08), rgba(18,182,216,.08));
+  border:1.5px solid rgba(139,92,246,.20);
+  border-radius:12px;
+  font-size:.82rem;
+  color:var(--ink-soft);
+  font-weight:600;
+  line-height:1.55;
+}
+.ai-field{ display:flex; flex-direction:column; gap:6px; }
+.ai-field label{ font-size:.78rem; font-weight:800; color:var(--ink-soft); }
+.ai-field input,
+.ai-field select,
+.ai-field textarea{
+  padding:10px 12px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  font-family:inherit; font-size:.85rem; font-weight:600;
+  color:var(--ink);
+  outline:none;
+  transition:all .2s var(--ease);
+}
+.ai-field textarea{ resize:vertical; min-height:80px; line-height:1.55; }
+.ai-field input:focus,
+.ai-field select:focus,
+.ai-field textarea:focus{ border-color:var(--purple-400); box-shadow:0 0 0 3px rgba(139,92,246,.12); }
+.ai-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.ai-generate-btn{
+  padding:12px 20px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+  border:none; border-radius:12px;
+  font-family:inherit; font-size:.88rem; font-weight:800;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all .25s var(--ease-bounce);
+  box-shadow:0 8px 20px rgba(91,59,181,.30);
+}
+.ai-generate-btn:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 12px 26px rgba(91,59,181,.40); }
+.ai-generate-btn:disabled{ opacity:.6; cursor:not-allowed; }
+.ai-generate-btn svg{ width:16px; height:16px; }
+
+.ai-output{
+  padding:14px;
+  background:var(--surface-soft);
+  border:1.5px dashed var(--border-strong);
+  border-radius:12px;
+  font-size:.82rem;
+  color:var(--ink-soft);
+  line-height:1.7;
+  font-weight:600;
+  white-space:pre-wrap;
+  min-height:80px;
+  animation:fadeIn .3s var(--ease);
+}
+@keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+.ai-output:empty::before{
+  content:"ستظهر النتيجة هنا...";
+  color:var(--ink-mute);
+  font-style:italic;
+  font-weight:600;
+}
+.ai-output h4{
+  margin:0 0 8px;
+  font-size:.9rem;
+  font-weight:800;
+  color:var(--purple-600);
+}
+[data-theme="dark"] .ai-output h4{ color:var(--purple-400); }
+.ai-output ul{ margin:6px 0; padding-inline-start:20px; }
+.ai-output li{ margin-bottom:4px; }
+.ai-output .step{ display:flex; gap:8px; margin-bottom:8px; padding:8px; background:var(--surface); border-radius:8px; border:1px solid var(--border); }
+.ai-output .step__num{ width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg, var(--purple-600), var(--cyan-500)); color:#fff; display:grid; place-items:center; font-size:.72rem; font-weight:800; flex-shrink:0; }
+
+/* Quiz styles */
+.ai-quiz-q{
+  padding:14px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  margin-bottom:12px;
+  animation:cardIn .4s var(--ease-bounce) both;
+}
+.ai-quiz-q__title{ font-weight:800; font-size:.88rem; color:var(--ink); margin-bottom:10px; }
+.ai-quiz-opts{ display:flex; flex-direction:column; gap:8px; }
+.ai-quiz-opt{
+  padding:9px 12px;
+  background:var(--surface-soft);
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  font-family:inherit; font-size:.82rem; font-weight:600;
+  color:var(--ink);
+  text-align:right;
+  transition:all .2s var(--ease);
+}
+.ai-quiz-opt:hover{ border-color:var(--purple-400); background:rgba(139,92,246,.06); }
+.ai-quiz-opt.correct{ background:rgba(22,163,74,.12); border-color:var(--green-500); color:var(--green-500); }
+.ai-quiz-opt.wrong{ background:rgba(220,38,38,.10); border-color:var(--red-500); color:var(--red-500); }
+
+/* Recommendation cards */
+.ai-reco{
+  padding:12px 14px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  margin-bottom:10px;
+  display:flex; gap:12px; align-items:flex-start;
+  animation:cardIn .4s var(--ease-bounce) both;
+  transition:all .25s var(--ease);
+}
+.ai-reco:hover{ border-color:var(--purple-400); transform:translateX(-4px); }
+.ai-reco__icon{
+  width:40px; height:40px; border-radius:10px;
+  background:linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  color:#fff;
+  display:grid; place-items:center;
+  flex-shrink:0;
+}
+.ai-reco__icon svg{ width:18px; height:18px; }
+.ai-reco__body{ flex:1; }
+.ai-reco__title{ font-weight:800; font-size:.88rem; color:var(--ink); margin:0 0 2px; }
+.ai-reco__reason{ font-size:.75rem; color:var(--ink-mute); font-weight:600; margin:0; }
+
+/* Pomodoro */
+.pomodoro{
+  margin:12px 18px;
+  padding:14px;
+  background:linear-gradient(135deg, rgba(220,38,38,.08), rgba(249,115,22,.08));
+  border:1.5px solid rgba(220,38,38,.20);
+  border-radius:14px;
+  display:flex; align-items:center; gap:12px;
+}
+.pomodoro__display{
+  display:flex; flex-direction:column; gap:2px;
+  flex:1;
+}
+.pomodoro__time{
+  font-size:1.4rem; font-weight:800; color:var(--red-500);
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+.pomodoro__label{
+  font-size:.68rem; font-weight:800; color:var(--ink-mute);
+}
+.pomodoro__btn{
+  padding:8px 16px;
+  background:linear-gradient(135deg, var(--red-500), var(--red-400));
+  color:#fff;
+  border:none; border-radius:10px;
+  font-family:inherit; font-size:.78rem; font-weight:800;
+  cursor:pointer;
+  transition:all .2s var(--ease);
+  box-shadow:0 4px 12px rgba(220,38,38,.30);
+}
+.pomodoro__btn:hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(220,38,38,.40); }
+
+/* Modal */
+.modal-backdrop{
+  position:fixed; inset:0; z-index:200;
+  background:rgba(6,15,38,.65);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:grid; place-items:center;
+  padding:20px;
+  opacity:0; visibility:hidden;
+  transition:opacity .25s var(--ease), visibility .25s var(--ease);
+}
+.modal-backdrop.is-open{ opacity:1; visibility:visible; }
+.modal-backdrop[hidden]{ display:none; }
+.modal{
+  background:var(--surface);
+  border-radius:var(--radius-2xl);
+  padding:32px 28px 24px;
+  max-width:420px; width:100%;
+  box-shadow:var(--shadow-lg);
+  text-align:center;
+  position:relative;
+  transform:scale(.9) translateY(20px);
+  transition:transform .35s var(--ease-bounce);
+  border:1.5px solid var(--border);
+}
+.modal-backdrop.is-open .modal{ transform:scale(1) translateY(0); }
+.modal__icon{
+  display:grid; place-items:center;
+  width:64px; height:64px;
+  margin:0 auto 16px;
+  border-radius:50%;
+  background:linear-gradient(135deg, rgba(220,38,38,.15), rgba(239,68,68,.08));
+  color:var(--red-500);
+}
+.modal__icon svg{ width:28px; height:28px; }
+.modal__title{ margin:0 0 8px; font-size:1.15rem; font-weight:800; color:var(--ink); }
+.modal__desc{ margin:0 0 24px; font-size:.9rem; color:var(--ink-soft); line-height:1.65; }
+.modal__actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.modal__actions .btn{ flex:1; min-width:120px; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding:13px 24px;
+  font-family:inherit; font-size:.9rem; font-weight:800;
+  line-height:1; border-radius:var(--radius-md);
+  border:1.5px solid transparent;
+  cursor:pointer; text-decoration:none;
+  min-height:48px;
+  transition:all .25s var(--ease);
+}
+.btn svg{ width:18px; height:18px; flex-shrink:0; }
+.btn--ghost{ color:var(--ink); background:var(--surface); border:1.5px solid var(--border); }
+.btn--ghost:hover{ border-color:var(--blue-700); color:var(--blue-700); background:rgba(18,72,184,.05); transform:translateY(-1px); }
+.btn--danger-solid{
+  color:#fff;
+  background:linear-gradient(135deg, var(--red-500), var(--red-400));
+  border:none;
+  box-shadow:0 8px 20px rgba(220,38,38,.30);
+}
+.btn--danger-solid:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(220,38,38,.40); }
+
+/* Toast */
+.toast-stack{
+  position:fixed; top:20px; inset-inline-end:20px; z-index:250;
+  display:flex; flex-direction:column; gap:10px;
+  max-width:min(380px, calc(100vw - 40px));
+  pointer-events:none;
+}
+.toast{
+  pointer-events:auto;
+  display:flex; align-items:flex-start; gap:12px;
+  padding:14px 16px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  color:var(--ink); font-size:.88rem; line-height:1.55;
+  animation:toastIn .4s var(--ease-bounce) both;
+}
+.toast.is-leaving{ animation:toastOut .3s var(--ease) forwards; }
+@keyframes toastIn{ from{ opacity:0; transform:translateX(40px) scale(.9); } to{ opacity:1; transform:translateX(0) scale(1); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(40px) scale(.9); } }
+.toast__icon{
+  flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  display:grid; place-items:center; color:#fff;
+}
+.toast__icon svg{ width:17px; height:17px; }
+.toast--info .toast__icon{ background:linear-gradient(135deg, var(--blue-700), var(--cyan-500)); }
+.toast--success .toast__icon{ background:linear-gradient(135deg, var(--green-500), var(--green-400)); }
+.toast--error .toast__icon{ background:linear-gradient(135deg, var(--red-500), var(--red-400)); }
+.toast__body{ flex:1; }
+.toast__title{ font-weight:800; margin:0 0 2px; font-size:.92rem; }
+.toast__msg{ margin:0; color:var(--ink-soft); font-size:.82rem; }
+.toast__close{
+  flex-shrink:0;
+  width:26px; height:26px;
+  border:none; background:transparent;
+  color:var(--ink-mute);
+  border-radius:6px;
+  cursor:pointer;
+  display:grid; place-items:center;
+  transition:all .2s var(--ease);
+}
+.toast__close:hover{ background:var(--surface-soft); color:var(--ink); }
+.toast__close svg{ width:14px; height:14px; }
+
+/* Kbd hint */
+.kbd-hint{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  justify-content:center;
+  margin-top:20px;
+  padding:12px 16px;
+  font-size:.78rem; font-weight:700;
+  color:var(--ink-mute);
+  background:var(--surface-soft);
+  border:1px dashed var(--border);
+  border-radius:var(--radius-md);
+}
+.kbd-hint kbd{
+  padding:2px 8px; border-radius:6px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  font-family:ui-monospace,monospace;
+  font-size:.72rem; font-weight:700;
+  color:var(--ink);
+}
+
+/* Responsive */
+@media (max-width:640px){
+  .courses-grid{ grid-template-columns:1fr; }
+  .header__brand-ar{ font-size:1.05rem; }
+  .header__logo{ width:38px; height:38px; }
+  .intro__stats{ gap:18px; }
+  .search kbd{ display:none; }
+  .toolbar__right{ width:100%; }
+  .sort-wrap{ flex:1; }
+  .sort-select{ width:100%; }
+  .user-menu__trigger{ padding:3px; border-radius:50%; }
+  .ai-fab{ bottom:16px; right:16px; width:56px; height:56px; }
+  .ai-panel{ right:8px; left:8px; bottom:88px; width:auto; height:calc(100vh - 110px); }
+  .ai-tools-grid{ grid-template-columns:1fr 1fr; }
+  .profile-hero__avatar{ width:72px; height:72px; font-size:1.8rem; margin:0 auto; }
+  .quick-dock{ top:70px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
+@media (forced-colors: active){
+  .course-card, .chip, .header__icon-btn, .bookmark-btn, .btn{ border:2px solid ButtonText; }
+  .course-card:has(.course-card__title-link:focus-visible){ outline:3px solid Highlight; }
+}
+@media (prefers-contrast: more){
+  :root{ --ink-mute:#3d5a8c; --border:#a8c1e8; }
+}
+</style>
+</head>
+
+<body>
+
+<a href="#main-content" class="skip-link">تخطَّ إلى المحتوى الرئيسي</a>
+<div class="sr-only" id="sr-announcer" aria-live="polite" aria-atomic="true"></div>
+
+<div class="loading-overlay" id="loading-overlay" role="status" aria-busy="true" aria-label="جاري التحقق من الجلسة">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <p class="loading-text">جاري التحقق من الجلسة...</p>
+</div>
+
+<div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+<div class="app" id="app" hidden>
+
+  <header class="header">
+    <div class="header__inner">
+      <a href="content.html" class="header__brand" aria-label="منصة أقدر — الصفحة الرئيسية">
+        <svg class="header__logo" viewBox="0 0 240 240" aria-hidden="true">
+          <defs>
+            <linearGradient id="hShirt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4A7CEC"/><stop offset="100%" stop-color="#2457D6"/>
+            </linearGradient>
+            <linearGradient id="hStar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFE066"/><stop offset="100%" stop-color="#F5A623"/>
+            </linearGradient>
+            <radialGradient id="hInner">
+              <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#eaf3ff"/>
+            </radialGradient>
+          </defs>
+          <circle cx="120" cy="120" r="108" fill="url(#hInner)"/>
+          <circle cx="120" cy="120" r="108" fill="none" stroke="#1248b8" stroke-width="1.6" stroke-dasharray="3 10" opacity=".28"/>
+          <path d="M92 158 Q84 180 82 196" stroke="#2457D6" stroke-width="12" stroke-linecap="round" fill="none"/>
+          <circle cx="82" cy="198" r="6" fill="#FFD3AE"/>
+          <rect x="114" y="138" width="12" height="22" rx="6" fill="#FFD3AE"/>
+          <path d="M92 168 Q92 152 110 150 L130 150 Q148 152 148 168 L148 200 Q148 212 138 212 L102 212 Q92 212 92 200 Z" fill="url(#hShirt)"/>
+          <path d="M148 168 Q170 148 184 122" stroke="#2457D6" stroke-width="12" stroke-linecap="round" fill="none"/>
+          <path d="M94 204 h52 v32 q0 6 -6 6 h-6 q-6 0 -6 -6 v-10 l-4 -6 l-4 6 v10 q0 6 -6 6 h-6 q-6 0 -6 -6 Z" fill="#17315F"/>
+          <ellipse cx="106" cy="244" rx="11" ry="5.5" fill="#17315F"/>
+          <ellipse cx="134" cy="244" rx="11" ry="5.5" fill="#17315F"/>
+          <circle cx="120" cy="120" r="28" fill="#FFD3AE"/>
+          <path d="M92 120 Q90 94 112 88 Q134 84 148 96 Q156 108 148 124 Q142 110 130 104 Q112 96 100 106 Q94 112 92 120 Z" fill="#1A2B4C"/>
+          <path d="M108 122 Q112 118 116 122" stroke="#1A2B4C" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M126 122 Q130 118 134 122" stroke="#1A2B4C" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M110 132 Q120 142 130 132" stroke="#1A2B4C" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M196 36 L203 58 L226 60 L208 74 L213 96 L196 84 L179 96 L184 74 L166 60 L189 58 Z" fill="url(#hStar)"/>
+        </svg>
+        <div class="header__brand-text">
+          <span class="header__brand-ar">أقدر</span>
+          <span class="header__brand-en">AQDAR</span>
+        </div>
+      </a>
+
+      <div class="header__user">
+        <button type="button" class="ai-pill" id="ai-pill" aria-label="افتح مساعد أقدر الذكي">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/>
+            <circle cx="19" cy="5" r="1" fill="currentColor"/>
+            <circle cx="5" cy="19" r="1" fill="currentColor"/>
+          </svg>
+          مساعد AI
+        </button>
+
+        <button type="button" class="header__icon-btn" id="theme-toggle"
+                aria-label="تبديل المظهر الليلي" aria-pressed="false" title="تبديل المظهر">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2 V4"/><path d="M12 20 V22"/>
+            <path d="M4.93 4.93 L6.34 6.34"/><path d="M17.66 17.66 L19.07 19.07"/>
+            <path d="M2 12 H4"/><path d="M20 12 H22"/>
+            <path d="M4.93 19.07 L6.34 17.66"/><path d="M17.66 6.34 L19.07 4.93"/>
+          </svg>
+        </button>
+
+        <div class="user-menu" id="user-menu">
+          <button type="button" class="user-menu__trigger" id="user-menu-trigger"
+                  aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu-panel"
+                  aria-label="قائمة المستخدم — بيانات الحساب">
+            <div class="header__user-avatar" id="header-avatar" aria-hidden="true">ط</div>
+            <div class="user-menu__trigger-info" aria-hidden="true">
+              <span class="user-menu__trigger-name" id="header-name">مستخدم</span>
+              <span class="user-menu__trigger-role">طالب</span>
+            </div>
+            <svg class="user-menu__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9 L12 15 L18 9"/>
+            </svg>
+          </button>
+
+          <div class="user-menu__panel" id="user-menu-panel" role="menu" aria-labelledby="user-menu-trigger" hidden>
+            <div class="user-menu__header">
+              <div class="user-menu__avatar" id="dropdown-avatar" aria-hidden="true">ط</div>
+              <div class="user-menu__header-text">
+                <strong class="user-menu__name" id="dropdown-name">—</strong>
+                <span class="user-menu__email" id="dropdown-email">—</span>
+              </div>
+            </div>
+            <dl class="user-menu__meta">
+              <div class="user-menu__meta-row">
+                <dt>حالة الحساب</dt>
+                <dd><span class="badge badge--success" id="dropdown-status">مفعّل</span></dd>
+              </div>
+              <div class="user-menu__meta-row">
+                <dt>عضو منذ</dt>
+                <dd id="dropdown-joined">—</dd>
+              </div>
+              <div class="user-menu__meta-row">
+                <dt>آخر دخول</dt>
+                <dd id="dropdown-last-login">—</dd>
+              </div>
+            </dl>
+            <button type="button" class="user-menu__logout" id="logout-btn" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 3 H5 A2 2 0 0 0 3 5 V19 A2 2 0 0 0 5 21 H9"/>
+                <path d="M16 17 L21 12 L16 7"/><path d="M21 12 H9"/>
+              </svg>
+              تسجيل الخروج
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main" id="main-content" tabindex="-1">
+
+    <!-- LIVE BAR -->
+    <div class="live-bar" aria-label="حالة الطالب المباشرة">
+      <div class="live-bar__greet">
+        <div class="live-bar__greet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </div>
+        <div class="live-bar__greet-text">
+          <span class="live-bar__greet-title" id="live-greeting">أهلًا بيك! 👋</span>
+          <span class="live-bar__greet-sub" id="live-date">—</span>
+        </div>
+      </div>
+      <div class="live-bar__pills">
+        <span class="live-pill live-pill--streak" title="ستريك المذاكرة">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 4 6 4 10a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 3 1 3s1-2-1-5c-1-2 0-3 2-3z"/></svg>
+          <span id="live-streak">5 أيام</span>
+        </span>
+        <span class="live-pill live-pill--xp" title="نقاط الخبرة">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+          <span id="live-xp">1,240 XP</span>
+        </span>
+        <span class="live-pill live-pill--clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span id="live-clock">--:--</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- PROFILE HERO -->
+    <section class="profile-hero" aria-labelledby="profile-name">
+      <div class="profile-hero__avatar-wrap">
+        <div class="profile-hero__avatar" id="profile-avatar" aria-hidden="true">ط</div>
+        <span class="profile-hero__level-badge" id="profile-level">المستوى 3</span>
+      </div>
+      <div class="profile-hero__body">
+        <h2 class="profile-hero__name" id="profile-name">مستخدم</h2>
+        <p class="profile-hero__tagline" id="profile-tagline">متعلم نشيط 🌟 · عضوية ذهبية</p>
+        <div class="profile-hero__stats" role="list">
+          <div class="profile-stat" role="listitem">
+            <span class="profile-stat__value" id="stat-streak">5</span>
+            <span class="profile-stat__label">🔥 ستريك</span>
+          </div>
+          <div class="profile-stat" role="listitem">
+            <span class="profile-stat__value" id="stat-progress">34%</span>
+            <span class="profile-stat__label">📊 تقدمك</span>
+          </div>
+          <div class="profile-stat" role="listitem">
+            <span class="profile-stat__value" id="stat-achievements">3</span>
+            <span class="profile-stat__label">🏆 إنجاز</span>
+          </div>
+          <div class="profile-stat" role="listitem">
+            <span class="profile-stat__value" id="stat-hours">28h</span>
+            <span class="profile-stat__label">⏱️ دراسة</span>
+          </div>
+        </div>
+        <div class="profile-hero__xp">
+          <div class="profile-hero__xp-label">
+            <span>التقدم للمستوى التالي</span>
+            <span class="profile-hero__xp-value"><span id="xp-current">240</span> / <span id="xp-next">500</span> XP</span>
+          </div>
+          <div class="xp-track">
+            <div class="xp-fill" id="xp-fill" style="width:48%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="achievements-strip" aria-label="إنجازاتك">
+      <span class="achievement">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+        بادئ الرحلة
+      </span>
+      <span class="achievement">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 4 6 4 10a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 3 1 3s1-2-1-5c-1-2 0-3 2-3z"/></svg>
+        5 أيام متواصلة
+      </span>
+      <span class="achievement">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 4-4 4-4-4z M6 10l4 4-4 4-4-4z M18 10l4 4-4 4-4-4z"/></svg>
+        ملك الاختبارات
+      </span>
+      <span class="achievement achievement--locked">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        مادة مكتملة
+      </span>
+      <span class="achievement achievement--locked">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        30 يوم متواصل
+      </span>
+    </div>
+
+    <!-- ACTIVITY TICKER -->
+    <div class="activity-ticker" aria-live="polite" aria-label="نشاط الزملاء">
+      <span class="activity-ticker__dot" aria-hidden="true"></span>
+      <span class="activity-ticker__text" id="activity-msg">جاري تحميل النشاط...</span>
+      <span class="activity-ticker__badge">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 20c0-2 2-3 4-3s4 1 4 3"/></svg>
+        مباشر
+      </span>
+    </div>
+
+    <!-- Hero -->
+    <section class="intro" aria-labelledby="intro-heading">
+      <span class="intro__orb intro__orb--1" aria-hidden="true"></span>
+      <span class="intro__orb intro__orb--2" aria-hidden="true"></span>
+      <span class="intro__orb intro__orb--3" aria-hidden="true"></span>
+      <div class="intro__inner">
+        <span class="intro__badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/>
+          </svg>
+          المحتوى التعليمي + الذكاء الاصطناعي
+        </span>
+        <h1 class="intro__title" id="intro-heading">
+          أهلًا <span id="intro-name">بيك</span>!
+          <span class="intro__title-accent">جاهز تتعلم أذكى؟</span>
+        </h1>
+        <p class="intro__desc">
+          كل مقررات وزارة التربية والتعليم في مكان واحد — مع مساعد ذكي يفكر معك، يخطط لك، ويولّد اختباراتك.
+        </p>
+
+        <div class="intro__stats" role="list" aria-label="إحصائيات المنصة">
+          <div class="intro__stat" role="listitem">
+            <span class="intro__stat-value" data-stat="courses">20</span>
+            <span class="intro__stat-label">مادة دراسية</span>
+          </div>
+          <div class="intro__stat" role="listitem">
+            <span class="intro__stat-value" data-stat="lessons">300</span>
+            <span class="intro__stat-label">درس تفاعلي</span>
+          </div>
+          <div class="intro__stat" role="listitem">
+            <span class="intro__stat-value">4.8</span>
+            <span class="intro__stat-label">متوسط التقييم</span>
+          </div>
+          <div class="intro__stat" role="listitem">
+            <span class="intro__stat-value">∞</span>
+            <span class="intro__stat-label">إمكانيات AI</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Showcase -->
+    <section class="ai-showcase" aria-labelledby="ai-showcase-heading">
+      <div class="ai-showcase__inner">
+        <div class="ai-showcase__head">
+          <div class="ai-showcase__title-wrap">
+            <div class="ai-showcase__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/>
+                <circle cx="19" cy="5" r="1" fill="currentColor"/>
+                <circle cx="5" cy="19" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="ai-showcase__title" id="ai-showcase-heading">قوى الذكاء الاصطناعي</h2>
+              <p class="ai-showcase__subtitle">مساعد يفكر معك خطوة بخطوة — أذكى من أي مدرس خصوصي</p>
+            </div>
+          </div>
+          <span class="ai-showcase__badge">مفكر ومتصل</span>
+        </div>
+
+        <div class="ai-tools-grid" id="ai-tools-grid">
+          <button class="ai-tool" data-ai-tool="chat" style="--ti:0">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </span>
+            <span class="ai-tool__title">مساعد الدراسة</span>
+            <span class="ai-tool__desc">يفكر معك خطوة بخطوة</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="plan" style="--ti:1">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg>
+            </span>
+            <span class="ai-tool__title">خطة دراسية</span>
+            <span class="ai-tool__desc">مخصصة لمستواك</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="quiz" style="--ti:2">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+            </span>
+            <span class="ai-tool__title">مولّد اختبارات</span>
+            <span class="ai-tool__desc">اختبر نفسك فورًا</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="summary" style="--ti:3">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </span>
+            <span class="ai-tool__title">تلخيص ذكي</span>
+            <span class="ai-tool__desc">لخّص أي درس</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="solve" style="--ti:4">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <span class="ai-tool__title">حل خطوة بخطوة</span>
+            <span class="ai-tool__desc">لكل مسألة</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="explain" style="--ti:5">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.9.7 1.5 1.8 1.5 3h5c0-1.2.6-2.3 1.5-3A7 7 0 0 0 12 2z"/></svg>
+            </span>
+            <span class="ai-tool__title">اشرح ببساطة</span>
+            <span class="ai-tool__desc">كأنك في ابتدائي</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="recommend" style="--ti:6">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+            </span>
+            <span class="ai-tool__title">توصيات ذكية</span>
+            <span class="ai-tool__desc">مواد مخصصة</span>
+          </button>
+
+          <button class="ai-tool" data-ai-tool="insights" style="--ti:7">
+            <span class="ai-tool__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg>
+            </span>
+            <span class="ai-tool__title">تحليل أداء</span>
+            <span class="ai-tool__desc">رؤى عن تقدمك</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Continue banner -->
+    <section class="continue-banner" id="continue-banner" hidden aria-labelledby="continue-title">
+      <div class="continue-banner__inner">
+        <div class="continue-banner__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7 V12 L15 14"/>
+          </svg>
+        </div>
+        <div class="continue-banner__text">
+          <span class="continue-banner__label">أكمل من حيث توقفت</span>
+          <h3 class="continue-banner__title" id="continue-title">—</h3>
+        </div>
+        <button type="button" class="continue-banner__btn" id="continue-btn">متابعة</button>
+      </div>
+    </section>
+
+    <!-- Quick dock -->
+    <div class="quick-dock" id="quick-dock" aria-label="وصول سريع للمواد">
+      <span class="quick-dock__label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+        وصول سريع
+      </span>
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21 L16.5 16.5"/>
+        </svg>
+        <label for="search-input" class="sr-only">بحث في المواد الدراسية</label>
+        <input type="search" id="search-input" placeholder="ابحث عن مادة..." autocomplete="off">
+        <kbd title="اضغط / للتركيز" aria-hidden="true">/</kbd>
+      </div>
+
+      <div class="toolbar__right">
+        <div class="sort-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6 H21"/><path d="M6 12 H18"/><path d="M10 18 H14"/>
+          </svg>
+          <label for="sort-select" class="sr-only">ترتيب المواد</label>
+          <select class="sort-select" id="sort-select">
+            <option value="default">افتراضي</option>
+            <option value="rating">الأعلى تقييمًا</option>
+            <option value="progress">الأكثر تقدمًا</option>
+            <option value="lessons">الأكثر دروسًا</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" id="filters" role="group" aria-label="تصفية المواد الدراسية">
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">
+        الكل <span class="chip__count" data-count="all" aria-hidden="true">20</span>
+      </button>
+      <button type="button" class="chip" data-filter="core" aria-pressed="false">
+        أساسية <span class="chip__count" data-count="core" aria-hidden="true">8</span>
+      </button>
+      <button type="button" class="chip" data-filter="science" aria-pressed="false">
+        علوم <span class="chip__count" data-count="science" aria-hidden="true">4</span>
+      </button>
+      <button type="button" class="chip" data-filter="arts" aria-pressed="false">
+        فنون ورياضة <span class="chip__count" data-count="arts" aria-hidden="true">2</span>
+      </button>
+      <button type="button" class="chip" data-filter="bookmarks" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2 L15 9 L22 9.5 L17 14.5 L18.5 22 L12 18 L5.5 22 L7 14.5 L2 9.5 L9 9 Z"/>
+        </svg>
+        المفضلة <span class="chip__count" data-count="bookmarks" aria-hidden="true">0</span>
+      </button>
+    </div>
+
+    <h2 class="section-title" id="courses-heading">
+      <span class="section-title__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 9 L12 4 L22 9 L12 14 Z"/>
+          <path d="M6 11 V16 C6 17.5 9 19 12 19 C15 19 18 17.5 18 16 V11"/>
+        </svg>
+      </span>
+      المواد الدراسية
+      <span class="section-title__count" id="results-count" role="status" aria-live="polite">20</span>
+    </h2>
+
+    <div class="courses-grid" id="courses-grid" aria-labelledby="courses-heading"></div>
+
+    <div class="kbd-hint" aria-label="اختصارات لوحة المفاتيح">
+      <span>اختصارات: <kbd>/</kbd> للبحث</span>
+      <span><kbd>A</kbd> لفتح المساعد الذكي</span>
+      <span><kbd>Tab</kbd> للتنقل</span>
+      <span><kbd>Esc</kbd> للإغلاق</span>
+    </div>
+
+  </main>
+</div>
+
+<!-- AI FAB -->
+<button type="button" class="ai-fab" id="ai-fab" aria-label="افتح المساعد الذكي" aria-expanded="false" aria-controls="ai-panel">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/>
+    <circle cx="19" cy="5" r="1" fill="currentColor"/>
+    <circle cx="5" cy="19" r="1" fill="currentColor"/>
+  </svg>
+  <span class="ai-fab__label">مساعد ذكي</span>
+</button>
+
+<!-- AI Panel -->
+<div class="ai-panel" id="ai-panel" role="dialog" aria-modal="false" aria-labelledby="ai-panel-title" hidden>
+  <header class="ai-panel__header">
+    <div class="ai-panel__avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/>
+      </svg>
+    </div>
+    <div class="ai-panel__head-text">
+      <h3 class="ai-panel__title" id="ai-panel-title">مساعد أقدر الذكي</h3>
+      <span class="ai-panel__status">مفكر · متصل · مستعد</span>
+    </div>
+    <button type="button" class="ai-panel__close" id="ai-close" aria-label="إغلاق المساعد">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 6 L18 18"/><path d="M18 6 L6 18"/>
+      </svg>
+    </button>
+  </header>
+
+  <nav class="ai-tabs" role="tablist" aria-label="أدوات المساعد الذكي">
+    <button class="ai-tab" role="tab" data-tab="chat" aria-selected="true" aria-controls="pane-chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      محادثة
+    </button>
+    <button class="ai-tab" role="tab" data-tab="solve" aria-selected="false" aria-controls="pane-solve">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      حل
+    </button>
+    <button class="ai-tab" role="tab" data-tab="plan" aria-selected="false" aria-controls="pane-plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      خطة
+    </button>
+    <button class="ai-tab" role="tab" data-tab="quiz" aria-selected="false" aria-controls="pane-quiz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      اختبار
+    </button>
+    <button class="ai-tab" role="tab" data-tab="summary" aria-selected="false" aria-controls="pane-summary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      ملخص
+    </button>
+    <button class="ai-tab" role="tab" data-tab="recommend" aria-selected="false" aria-controls="pane-recommend">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+      توصيات
+    </button>
+  </nav>
+
+  <div class="ai-body" id="ai-body">
+    <!-- Chat pane -->
+    <div class="ai-chat" id="pane-chat" role="tabpanel">
+      <div class="ai-chat__messages" id="ai-messages"></div>
+      <div class="ai-chat__suggestions" id="ai-suggestions">
+        <button class="ai-suggestion" data-prompt="اشرح لي درس الفيزياء ببساطة">اشرح ببساطة</button>
+        <button class="ai-suggestion" data-prompt="اعمل لي خطة مذاكرة لمدة أسبوع">خطة مذاكرة</button>
+        <button class="ai-suggestion" data-prompt="حل لي معادلة 2x + 5 = 13">حل معادلة</button>
+        <button class="ai-suggestion" data-prompt="ولد لي اختبار رياضيات متوسط">اختبار سريع</button>
+      </div>
+      <div class="ai-chat__input-wrap">
+        <textarea class="ai-chat__input" id="ai-input" placeholder="اسألني أي حاجة... (أنا بفكر معك)" rows="1" aria-label="سؤالك للمساعد الذكي"></textarea>
+        <button type="button" class="ai-mic-btn" id="ai-mic" aria-label="تحدث بصوتك">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3"/></svg>
+        </button>
+        <button type="button" class="ai-chat__send" id="ai-send" aria-label="إرسال">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 L11 13"/><path d="M22 2 L15 22 L11 13 L2 9 Z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Solve pane -->
+    <div class="ai-pane" id="pane-solve" role="tabpanel" hidden>
+      <div class="ai-pane__intro">🧮 اكتب أي مسألة، والمساعد هيحلها لك خطوة بخطوة مع الشرح.</div>
+      <div class="ai-field">
+        <label for="solve-input">المسألة</label>
+        <textarea id="solve-input" placeholder="مثال: 2x + 5 = 13 أو ما هو مشتق x²؟"></textarea>
+      </div>
+      <div class="ai-field">
+        <label for="solve-subject">المادة</label>
+        <select id="solve-subject">
+          <option value="math">رياضيات</option>
+          <option value="physics">فيزياء</option>
+          <option value="chemistry">كيمياء</option>
+        </select>
+      </div>
+      <button type="button" class="ai-generate-btn" id="solve-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/></svg>
+        حل خطوة بخطوة
+      </button>
+      <div class="ai-output" id="solve-output"></div>
+    </div>
+
+    <!-- Plan pane -->
+    <div class="ai-pane" id="pane-plan" role="tabpanel" hidden>
+      <div class="ai-pane__intro">🎯 اختار المادة وأيام المذاكرة، والمساعد الذكي هيبنيلك خطة مخصصة على مستواك.</div>
+      <div class="ai-field">
+        <label for="plan-subject">المادة</label>
+        <select id="plan-subject"></select>
+      </div>
+      <div class="ai-row">
+        <div class="ai-field">
+          <label for="plan-days">عدد الأيام</label>
+          <input type="number" id="plan-days" min="3" max="60" value="14">
+        </div>
+        <div class="ai-field">
+          <label for="plan-hours">ساعات/يوم</label>
+          <input type="number" id="plan-hours" min="1" max="8" value="2">
+        </div>
+      </div>
+      <div class="ai-field">
+        <label for="plan-level">مستواك</label>
+        <select id="plan-level">
+          <option value="beginner">مبتدئ</option>
+          <option value="intermediate" selected>متوسط</option>
+          <option value="advanced">متقدم</option>
+        </select>
+      </div>
+      <button type="button" class="ai-generate-btn" id="plan-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/></svg>
+        ولّد الخطة
+      </button>
+      <div class="ai-output" id="plan-output"></div>
+    </div>
+
+    <!-- Quiz pane -->
+    <div class="ai-pane" id="pane-quiz" role="tabpanel" hidden>
+      <div class="ai-pane__intro">📝 اختبر نفسك بأسئلة مولّدة ذكيًا حسب المادة ومستوى الصعوبة.</div>
+      <div class="ai-field">
+        <label for="quiz-subject">المادة</label>
+        <select id="quiz-subject"></select>
+      </div>
+      <div class="ai-field">
+        <label for="quiz-difficulty">الصعوبة</label>
+        <select id="quiz-difficulty">
+          <option value="easy">سهل</option>
+          <option value="medium" selected>متوسط</option>
+          <option value="hard">صعب</option>
+        </select>
+      </div>
+      <button type="button" class="ai-generate-btn" id="quiz-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        ولّد اختبار
+      </button>
+      <div id="quiz-output"></div>
+    </div>
+
+    <!-- Summary pane -->
+    <div class="ai-pane" id="pane-summary" role="tabpanel" hidden>
+      <div class="ai-pane__intro">📚 الصق أي نص أو درس، والمساعد الذكي هيلخصه لك في نقاط واضحة.</div>
+      <div class="ai-field">
+        <label for="summary-input">النص اللي عايز تلخصه</label>
+        <textarea id="summary-input" placeholder="الصق نص الدرس هنا..."></textarea>
+      </div>
+      <div class="ai-field">
+        <label for="summary-length">طول الملخص</label>
+        <select id="summary-length">
+          <option value="short">قصير جدًا</option>
+          <option value="medium" selected>متوسط</option>
+          <option value="long">مفصّل</option>
+        </select>
+      </div>
+      <button type="button" class="ai-generate-btn" id="summary-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        لخّص
+      </button>
+      <div class="ai-output" id="summary-output"></div>
+    </div>
+
+    <!-- Recommend pane -->
+    <div class="ai-pane" id="pane-recommend" role="tabpanel" hidden>
+      <div class="ai-pane__intro">✨ توصيات مخصصة بناءً على تقدمك واهتماماتك — كل ما استخدمت المنصة أكتر، التوصيات بتبقى أدق.</div>
+      <button type="button" class="ai-generate-btn" id="reco-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+        اقترح لي مواد
+      </button>
+      <div id="reco-output"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Back to Top -->
+<button type="button" class="back-to-top" id="back-to-top" aria-label="الرجوع للأعلى" title="الرجوع للأعلى">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19 V5"/><path d="M5 12 L12 5 L19 12"/>
+  </svg>
+</button>
+
+<!-- Logout Modal -->
+<div class="modal-backdrop" id="logout-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logout-title" aria-describedby="logout-desc">
+    <div class="modal__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 3 H5 A2 2 0 0 0 3 5 V19 A2 2 0 0 0 5 21 H9"/>
+        <path d="M16 17 L21 12 L16 7"/><path d="M21 12 H9"/>
+      </svg>
+    </div>
+    <h2 class="modal__title" id="logout-title">تأكيد تسجيل الخروج</h2>
+    <p class="modal__desc" id="logout-desc">
+      هل أنت متأكد من تسجيل الخروج من حسابك؟ ستحتاج لتسجيل الدخول مرة أخرى للمتابعة.
+    </p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn--ghost" id="modal-cancel" data-autofocus>لا، ابقَ</button>
+      <button type="button" class="btn btn--danger-solid" id="modal-confirm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 3 H5 A2 2 0 0 0 3 5 V19 A2 2 0 0 0 5 21 H9"/>
+          <path d="M16 17 L21 12 L16 7"/><path d="M21 12 H9"/>
+        </svg>
+        نعم، خروج
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  function getSupabase() {
+    if (typeof window.getSupabase === 'function') return window.getSupabase();
+    return window.supabaseClient || null;
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const $$ = (selector) => document.querySelectorAll(selector);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  let lastFocusEl = null;
+  let activeFilter = 'all';
+  let activeSort = 'default';
+  let activeQuery = '';
+  let lastCourseKey = null;
+
+  /* ============================================================
+     SUBJECTS
+     ============================================================ */
+  const SUBJECTS = [
+    { key:'ar',       title:'اللغة العربية',      cat:'core',       c1:'#5b3bb5', c2:'#8b5cf6', sh:'rgba(91,59,181,.30)',   icon:'book',     emoji:'📖',  teacher:'أ. أحمد فتحي',        lessons:24, duration:18, rating:4.9, progress:35, level:'intermediate', desc:'نحو وصرف وبلاغة وأدب وتعبير' },
+    { key:'math',     title:'الرياضيات',          cat:'core',       c1:'#f97316', c2:'#ffb020', sh:'rgba(249,115,22,.30)',  icon:'math',     emoji:'📐',  teacher:'أ. محمد عبدالله',      lessons:26, duration:20, rating:4.8, progress:40, level:'intermediate', desc:'جبر وهندسة وحساب مثلثات وتفاضل' },
+    { key:'sci',      title:'العلوم',             cat:'core',       c1:'#16a34a', c2:'#22c55e', sh:'rgba(22,163,74,.30)',   icon:'flask',    emoji:'🔬',  teacher:'أ. سارة إبراهيم',      lessons:20, duration:14, rating:4.9, progress:60, level:'beginner',     desc:'فيزياء وكيمياء وأحياء مبسطة' },
+    { key:'social',   title:'الدراسات الاجتماعية',cat:'core',       c1:'#0891b2', c2:'#22d3ee', sh:'rgba(8,145,178,.30)',   icon:'map',      emoji:'🗺️', teacher:'أ. منى السيد',         lessons:18, duration:12, rating:4.7, progress:25, level:'intermediate', desc:'تاريخ وجغرافيا ومواطنة' },
+    { key:'religion', title:'التربية الدينية',    cat:'core',       c1:'#b45309', c2:'#f59e0b', sh:'rgba(180,83,9,.30)',    icon:'book',     emoji:'🕌',  teacher:'أ. خالد محمود',        lessons:16, duration:10, rating:4.9, progress:55, level:'beginner',     desc:'قرآن وتفسير وفقه وسيرة' },
+    { key:'it',       title:'الحاسب الآلي',       cat:'core',       c1:'#0b2b6b', c2:'#1b5fd9', sh:'rgba(11,43,107,.30)',   icon:'code',     emoji:'💻',  teacher:'م. طارق يوسف',         lessons:14, duration:12, rating:4.8, progress:30, level:'intermediate', desc:'برمجة وتفكير حاسوبي وأمن رقمي' },
+    { key:'skills',   title:'المهارات المهنية',   cat:'core',       c1:'#db2777', c2:'#ec4899', sh:'rgba(219,39,119,.30)',  icon:'briefcase',emoji:'💼', teacher:'أ. هدى مصطفى',         lessons:12, duration:8,  rating:4.6, progress:20, level:'beginner',     desc:'مهارات حياتية وتفكير نقدي وريادة' },
+  ];
+
+  const ICONS = {
+    math: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h4"/><path d="M12 8v4"/>',
+    flask: '<path d="M9 3h6v5l5 12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2l5-12V3z"/><path d="M9 8h6"/>',
+    book: '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V4z"/><path d="M20 4h-2a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h2"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    atom: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/>',
+    dna: '<path d="M8 3c0 6 8 6 8 12s-8 6-8 6"/><path d="M16 3c0 6-8 6-8 12s8 6 8 6"/><path d="M7 9h10M7 15h10"/>',
+    brain: '<path d="M9 4a3 3 0 0 0-3 3v2a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3c0 2 2 3 3 3h2V4H9z"/><path d="M15 4a3 3 0 0 1 3 3v2a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3c0 2-2 3-3 3h-2V4h2z"/>',
+    heart: '<path d="M12 20s-8-4-8-10a5 5 0 0 1 8-3 5 5 0 0 1 8 3c0 6-8 10-8 10z"/>',
+    scroll: '<path d="M5 4h14a1 1 0 0 1 1 1v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    map: '<path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>',
+    mountain: '<path d="M3 20l6-10 4 6 4-8 4 12H3z"/>',
+    palette: '<circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1.5" fill="currentColor"/><circle cx="15" cy="9" r="1.5" fill="currentColor"/><circle cx="9" cy="15" r="1.5" fill="currentColor"/><circle cx="15" cy="15" r="1.5" fill="currentColor"/>',
+    activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+    code: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/>',
+    briefcase: '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+  };
+
+  /* ============================================================
+     RENDER SUBJECTS
+     ============================================================ */
+  function renderSubjects() {
+    const grid = $('courses-grid');
+    if (!grid) return;
+
+    grid.innerHTML = SUBJECTS.map((s, i) => {
+      const bm = s.progress > 0 ? '' : 'data-progress="0"';
+      return `
+        <article class="course-card" data-course="${s.key}" data-title="${s.title}"
+                 data-category="${s.cat}" data-lessons="${s.lessons}" data-duration="${s.duration}"
+                 data-rating="${s.rating}" data-progress="${s.progress}"
+                 aria-labelledby="course-${s.key}-title"
+                 style="--i:${i}; --card-c1:${s.c1}; --card-c2:${s.c2}; --card-shadow:${s.sh}" ${bm}>
+          <button type="button" class="bookmark-btn" data-bookmark="${s.key}"
+                  aria-pressed="false" aria-label="أضف ${s.title} للمفضلة">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2 L15 9 L22 9.5 L17 14.5 L18.5 22 L12 18 L5.5 22 L7 14.5 L2 9.5 L9 9 Z"/>
+            </svg>
+          </button>
+          <div class="course-card__top">
+            <span class="course-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">${ICONS[s.icon] || ICONS.book}</svg>
+            </span>
+            <span class="course-card__level level--${s.level}">${s.level==='beginner'?'مبتدئ':s.level==='intermediate'?'متوسط':'متقدم'}</span>
+          </div>
+          <h3 class="course-card__title" id="course-${s.key}-title">
+            <a href="#" class="course-card__title-link" data-course-link="${s.key}">${s.title}</a>
+          </h3>
+          <p class="course-card__desc">${s.desc}</p>
+          <div class="course-card__teacher">
+            <span class="teacher-avatar" aria-hidden="true">${s.teacher.charAt(s.teacher.indexOf('.')+1)?.trim() || s.teacher[0]}</span>
+            <span>${s.teacher}</span>
+          </div>
+          <div class="course-card__progress">
+            <div class="progress-label">
+              <span>${s.progress>0?'التقدم':'لم تبدأ بعد'}</span>
+              <span class="progress-value">${s.progress}%</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuenow="${s.progress}" aria-valuemin="0" aria-valuemax="100" aria-label="التقدم في ${s.title}">
+              <div class="progress-fill" style="width:${s.progress}%"></div>
+            </div>
+          </div>
+          <div class="course-card__meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5 V6 A2 2 0 0 1 6 4 H20 V20 H6 A2 2 0 0 1 4 18"/></svg> ${s.lessons} درس</span>
+            <span class="star"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 L15 9 L22 9.5 L17 14.5 L18.5 22 L12 18 L5.5 22 L7 14.5 L2 9.5 L9 9 Z"/></svg> ${s.rating}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14"/></svg> ${s.duration} س</span>
+          </div>
+        </article>`;
+    }).join('');
+
+    const planSubj = $('plan-subject');
+    const quizSubj = $('quiz-subject');
+    if (planSubj) planSubj.innerHTML = SUBJECTS.map(s => `<option value="${s.key}">${s.title}</option>`).join('');
+    if (quizSubj) quizSubj.innerHTML = SUBJECTS.map(s => `<option value="${s.key}">${s.title}</option>`).join('');
+
+    renderQuickDock();
+  }
+
+  /* ============================================================
+     QUICK DOCK — access facilitators
+     ============================================================ */
+  function renderQuickDock() {
+    const dock = $('quick-dock');
+    if (!dock) return;
+    // keep label
+    const label = dock.querySelector('.quick-dock__label');
+    dock.innerHTML = '';
+    if (label) dock.appendChild(label);
+
+    // Get top subjects by progress or bookmarked
+    const bookmarks = getBookmarks();
+    let topSubjects = SUBJECTS.filter(s => bookmarks.includes(s.key) || s.progress > 0).slice(0, 8);
+    if (!topSubjects.length) topSubjects = SUBJECTS.slice(0, 8);
+
+    topSubjects.forEach(s => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quick-dock__item';
+      btn.setAttribute('data-jump', s.key);
+      btn.innerHTML = `${s.emoji} ${s.title}`;
+      btn.addEventListener('click', () => jumpToSubject(s.key));
+      dock.appendChild(btn);
+    });
+  }
+
+  function jumpToSubject(key) {
+    const card = document.querySelector(`.course-card[data-course="${key}"]`);
+    if (!card) return;
+    // Ensure visible
+    if (card.hidden) {
+      activeFilter = 'all';
+      activeQuery = '';
+      if ($('search-input')) $('search-input').value = '';
+      $$('.chip').forEach(c => c.setAttribute('aria-pressed', c.getAttribute('data-filter') === 'all' ? 'true' : 'false'));
+      applyView();
+    }
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.style.transition = 'box-shadow .3s';
+    setTimeout(() => {
+      card.style.boxShadow = '0 0 0 4px var(--purple-400), 0 20px 40px rgba(139,92,246,.4)';
+      setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+    }, 400);
+    const link = card.querySelector('.course-card__title-link');
+    setTimeout(() => { if (link) link.focus({ preventScroll: true }); }, 600);
+  }
+
+  /* ============================================================
+     SCREEN READER + TOAST
+     ============================================================ */
+  function announce(message) {
+    const el = $('sr-announcer');
+    if (!el) return;
+    el.textContent = '';
+    setTimeout(() => { el.textContent = message; }, 80);
+  }
+
+  const TOAST_ICONS = {
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8 V13"/><circle cx="12" cy="16.5" r=".5" fill="currentColor"/></svg>',
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12 L10 17 L19 7"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8 V13"/><circle cx="12" cy="16.5" r=".5" fill="currentColor"/></svg>'
+  };
+
+  function showToast(type, title, message, duration) {
+    const stack = $('toast-stack');
+    if (!stack) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast--' + type;
+    toast.setAttribute('role', 'status');
+    toast.innerHTML =
+      '<div class="toast__icon" aria-hidden="true">' + (TOAST_ICONS[type] || TOAST_ICONS.info) + '</div>' +
+      '<div class="toast__body"><p class="toast__title">' + title + '</p>' +
+      (message ? '<p class="toast__msg">' + message + '</p>' : '') + '</div>' +
+      '<button type="button" class="toast__close" aria-label="إغلاق الإشعار">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6 L18 18"/><path d="M18 6 L6 18"/></svg></button>';
+    const remove = () => {
+      toast.classList.add('is-leaving');
+      setTimeout(() => toast.remove(), 320);
+    };
+    toast.querySelector('.toast__close').addEventListener('click', remove);
+    stack.appendChild(toast);
+    setTimeout(remove, duration || 3500);
+  }
+
+  /* ============================================================
+     LOADING / APP
+     ============================================================ */
+  function hideLoading() {
+    const overlay = $('loading-overlay');
+    if (overlay) {
+      overlay.classList.add('is-hidden');
+      overlay.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  function showApp() {
+    const app = $('app');
+    if (app) app.hidden = false;
+    hideLoading();
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.progress-fill').forEach(el => {
+        const width = el.style.width;
+        el.style.width = '0%';
+        setTimeout(() => { el.style.width = width; }, 150);
+      });
+    });
+    announce('تم تحميل الصفحة. اضغط Tab للتنقل بين المواد.');
+  }
+
+  /* ============================================================
+     USER INFO
+     ============================================================ */
+  function formatDate(iso) {
+    if (!iso) return '—';
+    try { return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }); }
+    catch (e) { return '—'; }
+  }
+
+  function formatRelative(iso) {
+    if (!iso) return '—';
+    try {
+      const date = new Date(iso);
+      const diff = Date.now() - date.getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'الآن';
+      if (mins < 60) return 'منذ ' + mins + ' دقيقة';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return 'منذ ' + hrs + ' ساعة';
+      const days = Math.floor(hrs / 24);
+      if (days < 30) return 'منذ ' + days + ' يوم';
+      return formatDate(iso);
+    } catch (e) { return '—'; }
+  }
+
+  function fillUserInfo(user, profile) {
+    if (!user) return;
+    const meta = user.user_metadata || {};
+    const fullName = profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
+      profile?.username || meta.display_name || [meta.first_name, meta.last_name].filter(Boolean).join(' ') ||
+      meta.username || (user.email ? user.email.split('@')[0] : 'طالب');
+    const firstName = profile?.first_name || meta.first_name || fullName.split(' ')[0] || 'طالب';
+    const initial = (fullName.trim()[0] || 'ط').toUpperCase();
+    const email = user.email || '—';
+    const joinedAt = user.created_at || null;
+    const lastSignIn = user.last_sign_in_at || null;
+    const confirmed = !!(user.email_confirmed_at || user.confirmed_at);
+
+    if ($('header-name')) $('header-name').textContent = firstName;
+    if ($('header-avatar')) $('header-avatar').textContent = initial;
+    if ($('intro-name')) $('intro-name').textContent = firstName;
+    if ($('dropdown-avatar')) $('dropdown-avatar').textContent = initial;
+    if ($('dropdown-name')) $('dropdown-name').textContent = fullName;
+    if ($('dropdown-email')) $('dropdown-email').textContent = email;
+
+    // Profile hero
+    if ($('profile-avatar')) $('profile-avatar').textContent = initial;
+    if ($('profile-name')) $('profile-name').textContent = fullName;
+
+    if ($('dropdown-status')) {
+      $('dropdown-status').textContent = confirmed ? 'مفعّل' : 'بانتظار التفعيل';
+      $('dropdown-status').className = 'badge ' + (confirmed ? 'badge--success' : 'badge--warn');
+    }
+    if ($('dropdown-joined')) $('dropdown-joined').textContent = formatDate(joinedAt);
+    if ($('dropdown-last-login')) $('dropdown-last-login').textContent = formatRelative(lastSignIn);
+
+    window.__aqdarUser = { fullName, email, joinedAt, lastSignIn, confirmed };
+  }
+
+  function redirectToLogin() {
+    window.location.replace('index.html#login');
+  }
+
+  /* ============================================================
+     THEME
+     ============================================================ */
+  function initTheme() {
+    const saved = localStorage.getItem('aqdar-theme');
+    let isDark = saved === 'dark' || (saved !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    applyTheme(isDark);
+    const btn = $('theme-toggle');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const nowDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!nowDark);
+        localStorage.setItem('aqdar-theme', !nowDark ? 'dark' : 'light');
+        announce(!nowDark ? 'تم تفعيل الوضع الليلي' : 'تم تفعيل الوضع النهاري');
+      });
+    }
+  }
+
+  function applyTheme(isDark) {
+    if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    const btn = $('theme-toggle');
+    if (btn) btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  }
+
+  /* ============================================================
+     BOOKMARKS
+     ============================================================ */
+  function getBookmarks() {
+    try { return JSON.parse(localStorage.getItem('aqdar-bookmarks')) || []; }
+    catch (e) { return []; }
+  }
+  function setBookmarks(list) {
+    try { localStorage.setItem('aqdar-bookmarks', JSON.stringify(list)); } catch (e) {}
+  }
+  function toggleBookmark(key) {
+    const list = getBookmarks();
+    const i = list.indexOf(key);
+    if (i >= 0) list.splice(i, 1); else list.push(key);
+    setBookmarks(list);
+    return list.includes(key);
+  }
+  function syncBookmarkButtons() {
+    const list = getBookmarks();
+    $$('.bookmark-btn').forEach(btn => {
+      const key = btn.getAttribute('data-bookmark');
+      const active = list.includes(key);
+      const card = btn.closest('.course-card');
+      const title = card ? (card.getAttribute('data-title') || '') : '';
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.setAttribute('aria-label', (active ? 'إزالة من المفضلة: ' : 'أضف للمفضلة: ') + title);
+    });
+    const bCount = document.querySelector('[data-count="bookmarks"]');
+    if (bCount) bCount.textContent = list.length;
+  }
+
+  /* ============================================================
+     CONTINUE LEARNING
+     ============================================================ */
+  function getLastCourse() {
+    try { return localStorage.getItem('aqdar-last-course'); }
+    catch (e) { return null; }
+  }
+  function setLastCourse(key) {
+    try { localStorage.setItem('aqdar-last-course', key); } catch (e) {}
+  }
+  function updateContinueBanner() {
+    const banner = $('continue-banner');
+    const titleEl = $('continue-title');
+    const key = getLastCourse();
+    if (!banner || !titleEl) return;
+    const card = key ? document.querySelector('.course-card[data-course="' + key + '"]') : null;
+    if (!card) { banner.hidden = true; return; }
+    titleEl.textContent = card.getAttribute('data-title') || '';
+    banner.hidden = false;
+    lastCourseKey = key;
+  }
+
+  /* ============================================================
+     LIVE BAR / PROFILE / STREAK / XP
+     ============================================================ */
+  const USER_STATE_KEY = 'aqdar-user-state';
+  const DEFAULT_USER_STATE = {
+    xp: 1240,
+    level: 3,
+    streak: 5,
+    lastActiveDate: null,
+    achievements: ['start', 'streak5', 'quiz_master'],
+  };
+
+  function loadUserState() {
+    try {
+      const raw = localStorage.getItem(USER_STATE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return { ...DEFAULT_USER_STATE, ...parsed };
+      }
+    } catch (e) {}
+    return { ...DEFAULT_USER_STATE };
+  }
+
+  function saveUserState(state) {
+    try { localStorage.setItem(USER_STATE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function checkStreak() {
+    const state = loadUserState();
+    const today = new Date().toISOString().slice(0, 10);
+    if (state.lastActiveDate === today) return state;
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (state.lastActiveDate === yesterday) {
+      state.streak += 1;
+      state.xp += 20; // daily bonus
+    } else if (state.lastActiveDate !== today) {
+      state.streak = 1;
+    }
+    state.lastActiveDate = today;
+    saveUserState(state);
+    return state;
+  }
+
+  function addXP(amount) {
+    const state = loadUserState();
+    state.xp += amount;
+    const xpForNext = state.level * 500;
+    if (state.xp >= xpForNext) {
+      state.level += 1;
+      state.xp = state.xp - xpForNext;
+      setTimeout(() => {
+        showToast('success', '🎉 ترقية!', 'مبروك! وصلت للمستوى ' + state.level, 5000);
+        updateProfileUI();
+      }, 500);
+    }
+    saveUserState(state);
+    updateProfileUI();
+  }
+
+  function updateProfileUI() {
+    const state = loadUserState();
+    const level = state.level;
+    const xpNext = level * 500;
+    const pct = Math.min(100, Math.round((state.xp / xpNext) * 100));
+
+    // Live bar
+    if ($('live-streak')) $('live-streak').textContent = state.streak + ' أيام';
+    if ($('live-xp')) $('live-xp').textContent = state.xp.toLocaleString('ar-EG') + ' XP';
+
+    // Profile
+    if ($('profile-level')) $('profile-level').textContent = 'المستوى ' + level;
+    if ($('stat-streak')) $('stat-streak').textContent = state.streak;
+    if ($('stat-achievements')) $('stat-achievements').textContent = state.achievements.length;
+    if ($('xp-current')) $('xp-current').textContent = state.xp;
+    if ($('xp-next')) $('xp-next').textContent = xpNext;
+    if ($('xp-fill')) $('xp-fill').style.width = pct + '%';
+
+    // Progress
+    const totalProgress = SUBJECTS.reduce((sum, s) => sum + s.progress, 0) / SUBJECTS.length;
+    if ($('stat-progress')) $('stat-progress').textContent = Math.round(totalProgress) + '%';
+
+    // Hours (simulated by total duration * progress)
+    const totalHours = SUBJECTS.reduce((sum, s) => sum + (s.duration * s.progress / 100), 0);
+    if ($('stat-hours')) $('stat-hours').textContent = Math.round(totalHours) + 'h';
+  }
+
+  function updateGreeting() {
+    const hour = new Date().getHours();
+    let greeting, emoji;
+    if (hour < 5) { greeting = 'سهران؟ يلا نذاكر'; emoji = '🌙'; }
+    else if (hour < 12) { greeting = 'صباح الخير'; emoji = '☀️'; }
+    else if (hour < 17) { greeting = 'مساء النور'; emoji = '🌤️'; }
+    else if (hour < 21) { greeting = 'مساء الخير'; emoji = '🌆'; }
+    else { greeting = 'سهرة مذاكرة موفقة'; emoji = '🌙'; }
+
+    const name = window.__aqdarUser?.fullName?.split(' ')[0] || 'يا بطل';
+    if ($('live-greeting')) $('live-greeting').textContent = greeting + ' ' + name + '! ' + emoji;
+
+    if ($('live-date')) {
+      const now = new Date();
+      const formatted = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+      $('live-date').textContent = formatted;
+    }
+  }
+
+  function updateClock() {
+    const el = $('live-clock');
+    if (!el) return;
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    el.textContent = hh + ':' + mm;
+  }
+
+  function initLiveBar() {
+    checkStreak();
+    updateProfileUI();
+    updateGreeting();
+    updateClock();
+    setInterval(updateClock, 30000); // every 30s
+    setInterval(updateGreeting, 60000); // every 1min
+  }
+
+  /* ============================================================
+     ACTIVITY TICKER
+     ============================================================ */
+  const ACTIVITY_MESSAGES = [
+    'أحمد حصل على إنجاز "ملك الاختبارات" 🏆',
+    'سارة أكملت درس الفيزياء بنجاح ✅',
+    'محمد بدأ دورة جديدة في الكيمياء 🧪',
+    'ليلى أجابت على 10 أسئلة صحيحة في الرياضيات 🎯',
+    'عمر رفع مستواه للمستوى 5 🚀',
+    'نور أكملت خطة مذاكرة الأسبوع 🎉',
+    'خالد سجل 5 أيام متواصلة 🔥',
+    'مريم أضافت 3 مواد للمفضلة ⭐',
+    'يوسف استخدم المساعد الذكي 15 مرة هذا الأسبوع 🤖',
+    'هبة أنهت اختبار صعب بنتيجة 95% 💯',
+  ];
+
+  function rotateActivity() {
+    const el = $('activity-msg');
+    if (!el) return;
+    let i = 0;
+    const update = () => {
+      el.innerHTML = '<span class="activity-ticker__msg">' + ACTIVITY_MESSAGES[i % ACTIVITY_MESSAGES.length] + '</span>';
+      i++;
+    };
+    update();
+    setInterval(update, 6000);
+  }
+
+  /* ============================================================
+     FILTERS / SORT / SEARCH
+     ============================================================ */
+  function updateFilterCounts() {
+    const cards = document.querySelectorAll('.course-card');
+    const counts = { all: cards.length, core: 0, science: 0, humanities: 0, langs: 0, arts: 0 };
+    cards.forEach(card => {
+      const cat = card.getAttribute('data-category');
+      if (counts[cat] !== undefined) counts[cat]++;
+    });
+    counts.bookmarks = getBookmarks().length;
+    Object.keys(counts).forEach(key => {
+      const el = document.querySelector('[data-count="' + key + '"]');
+      if (el) el.textContent = counts[key];
+    });
+  }
+
+  function applyView() {
+    const cards = document.querySelectorAll('.course-card');
+    const grid = $('courses-grid');
+    if (!grid) return;
+    const bookmarks = getBookmarks();
+    const query = activeQuery.trim().toLowerCase();
+    let visible = 0;
+
+    cards.forEach(card => {
+      const key = card.getAttribute('data-course');
+      const cat = card.getAttribute('data-category');
+      const title = (card.getAttribute('data-title') || '').toLowerCase();
+      const desc = (card.querySelector('.course-card__desc')?.textContent || '').toLowerCase();
+      const isBookmarked = bookmarks.includes(key);
+
+      let matchesFilter;
+      if (activeFilter === 'all') matchesFilter = true;
+      else if (activeFilter === 'bookmarks') matchesFilter = isBookmarked;
+      else matchesFilter = cat === activeFilter;
+
+      const matchesQuery = !query || title.includes(query) || desc.includes(query);
+      const show = matchesFilter && matchesQuery;
+      card.hidden = !show;
+      if (show) visible++;
+    });
+
+    const countEl = $('results-count');
+    if (countEl) countEl.textContent = visible;
+
+    const existing = grid.querySelector('.empty-state');
+    if (existing) existing.remove();
+
+    if (visible === 0) {
+      const div = document.createElement('div');
+      div.className = 'empty-state';
+      div.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21 L16.5 16.5"/></svg>' +
+        '<p>لا توجد نتائج مطابقة</p>' +
+        '<button type="button" class="empty-state__btn" id="reset-filters-btn">إعادة تعيين الفلاتر</button>';
+      grid.appendChild(div);
+      $('reset-filters-btn')?.addEventListener('click', resetFilters);
+    }
+
+    announce('عدد المواد المعروضة: ' + visible);
+  }
+
+  function applySort() {
+    const grid = $('courses-grid');
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.course-card'));
+    if (activeSort === 'default') return;
+    const sorted = cards.slice().sort((a, b) => {
+      if (activeSort === 'rating') return parseFloat(b.dataset.rating || 0) - parseFloat(a.dataset.rating || 0);
+      if (activeSort === 'progress') return parseFloat(b.dataset.progress || 0) - parseFloat(a.dataset.progress || 0);
+      if (activeSort === 'lessons') return parseInt(b.dataset.lessons || 0, 10) - parseInt(a.dataset.lessons || 0, 10);
+      return 0;
+    });
+    sorted.forEach((card, index) => {
+      card.style.setProperty('--i', index);
+      grid.appendChild(card);
+    });
+  }
+
+  function resetFilters() {
+    activeFilter = 'all';
+    activeQuery = '';
+    activeSort = 'default';
+    localStorage.removeItem('aqdar-filter');
+    localStorage.removeItem('aqdar-sort');
+    if ($('search-input')) $('search-input').value = '';
+    if ($('sort-select')) $('sort-select').value = 'default';
+    $$('.chip').forEach(chip => {
+      chip.setAttribute('aria-pressed', chip.getAttribute('data-filter') === 'all' ? 'true' : 'false');
+    });
+    applySort();
+    applyView();
+    showToast('info', 'تم إعادة التعيين', 'الفلاتر رجعت للحالة الافتراضية.');
+  }
+
+  function persistFilter(key) { try { localStorage.setItem('aqdar-filter', key); } catch (e) {} }
+  function persistSort(key) { try { localStorage.setItem('aqdar-sort', key); } catch (e) {} }
+
+  function restorePreferences() {
+    const savedFilter = localStorage.getItem('aqdar-filter');
+    if (savedFilter) {
+      activeFilter = savedFilter;
+      $$('.chip').forEach(chip => {
+        chip.setAttribute('aria-pressed', chip.getAttribute('data-filter') === savedFilter ? 'true' : 'false');
+      });
+    }
+    const savedSort = localStorage.getItem('aqdar-sort');
+    if (savedSort) {
+      activeSort = savedSort;
+      if ($('sort-select')) $('sort-select').value = savedSort;
+    }
+  }
+
+  function initToolbar() {
+    const searchInput = $('search-input');
+    const sortSelect = $('sort-select');
+    const chips = $$('.chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
+        chip.setAttribute('aria-pressed', 'true');
+        activeFilter = chip.getAttribute('data-filter');
+        persistFilter(activeFilter);
+        applyView();
+      });
+    });
+    if (searchInput) searchInput.addEventListener('input', e => { activeQuery = e.target.value; applyView(); });
+    if (sortSelect) sortSelect.addEventListener('change', e => {
+      activeSort = e.target.value;
+      persistSort(activeSort);
+      applySort();
+      applyView();
+    });
+  }
+
+  /* ============================================================
+     BACK TO TOP
+     ============================================================ */
+  function initBackToTop() {
+    const btn = $('back-to-top');
+    if (!btn) return;
+    const onScroll = () => btn.classList.toggle('is-visible', window.scrollY > 320);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+
+  /* ============================================================
+     USER MENU
+     ============================================================ */
+  function openUserMenu() {
+    const trigger = $('user-menu-trigger'), panel = $('user-menu-panel');
+    if (!trigger || !panel) return;
+    panel.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    setTimeout(() => {
+      const first = panel.querySelector('[role="menuitem"], button');
+      if (first) first.focus();
+    }, 50);
+  }
+  function closeUserMenu(returnFocus) {
+    const trigger = $('user-menu-trigger'), panel = $('user-menu-panel');
+    if (!trigger || !panel || panel.hidden) return;
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    if (returnFocus) trigger.focus();
+  }
+  function initUserMenu() {
+    const trigger = $('user-menu-trigger'), panel = $('user-menu-panel'), menu = $('user-menu');
+    if (!trigger || !panel) return;
+    trigger.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+      if (isOpen) closeUserMenu(true); else openUserMenu();
+    });
+    document.addEventListener('click', e => {
+      if (menu && !menu.contains(e.target)) closeUserMenu(false);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && trigger.getAttribute('aria-expanded') === 'true') {
+        e.preventDefault();
+        closeUserMenu(true);
+      }
+    });
+  }
+
+  /* ============================================================
+     LOGOUT
+     ============================================================ */
+  function openLogoutModal() {
+    const modal = $('logout-modal');
+    if (!modal) return;
+    closeUserMenu(false);
+    lastFocusEl = document.activeElement;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+      modal.classList.add('is-open');
+      setTimeout(() => {
+        const auto = modal.querySelector('[data-autofocus]');
+        if (auto) auto.focus();
+      }, 80);
+    });
+  }
+  function closeLogoutModal() {
+    const modal = $('logout-modal');
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    setTimeout(() => {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      if (lastFocusEl && typeof lastFocusEl.focus === 'function') lastFocusEl.focus();
+      lastFocusEl = null;
+    }, 250);
+  }
+  function trapFocus(event) {
+    const modal = $('logout-modal');
+    if (!modal || !modal.classList.contains('is-open')) return;
+    if (event.key !== 'Tab') return;
+    const focusables = modal.querySelectorAll('button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
+  async function performLogout() {
+    const client = getSupabase();
+    const confirmBtn = $('modal-confirm');
+    if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = '.7'; }
+    try {
+      if (!client) throw new Error('Supabase client unavailable');
+      const { error } = await client.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('[AQDAR] Logout error:', error);
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = ''; }
+      showToast('error', 'تعذر تسجيل الخروج', 'حدث خطأ أثناء تسجيل الخروج. حاول مرة أخرى.');
+      return;
+    }
+    closeLogoutModal();
+    showToast('success', 'تم تسجيل الخروج', 'جاري تحويلك لصفحة الدخول...', 1200);
+    setTimeout(redirectToLogin, 350);
+  }
+  function initLogout() {
+    const btn = $('logout-btn'), modal = $('logout-modal'), cancel = $('modal-cancel'), confirm = $('modal-confirm');
+    if (btn) btn.addEventListener('click', openLogoutModal);
+    if (cancel) cancel.addEventListener('click', closeLogoutModal);
+    if (confirm) confirm.addEventListener('click', performLogout);
+    if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeLogoutModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const m = $('logout-modal');
+        if (m && m.classList.contains('is-open')) { closeLogoutModal(); return; }
+      }
+      trapFocus(e);
+      const tag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();
+      const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select' || (document.activeElement && document.activeElement.isContentEditable);
+      const modalOpen = $('logout-modal')?.classList.contains('is-open');
+      const menuOpen = $('user-menu-trigger')?.getAttribute('aria-expanded') === 'true';
+      const aiOpen = !$('ai-panel')?.hidden;
+      if (!isTyping && !modalOpen && !menuOpen && !aiOpen && (e.key === '/' || (e.ctrlKey && e.key.toLowerCase() === 'k'))) {
+        if ($('search-input')) { e.preventDefault(); $('search-input').focus(); $('search-input').select(); }
+      }
+    });
+  }
+
+  /* ============================================================
+     COURSE CARDS
+     ============================================================ */
+  function initCourseCards() {
+    $$('.course-card__title-link').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const card = link.closest('.course-card');
+        const key = link.getAttribute('data-course-link') || (card && card.getAttribute('data-course'));
+        const title = card ? (card.getAttribute('data-title') || '') : '';
+        if (!key) return;
+        setLastCourse(key);
+        lastCourseKey = key;
+        updateContinueBanner();
+        addXP(10);
+        showToast('success', '🎓 بدأت مذاكرة', '"' + title + '" — +10 XP', 3500);
+      });
+    });
+
+    $$('.bookmark-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const key = btn.getAttribute('data-bookmark');
+        if (!key) return;
+        const nowActive = toggleBookmark(key);
+        const card = btn.closest('.course-card');
+        const title = card ? (card.getAttribute('data-title') || '') : '';
+        syncBookmarkButtons();
+        updateFilterCounts();
+        applyView();
+        renderQuickDock();
+        if (nowActive) addXP(3);
+        showToast(nowActive ? 'success' : 'info', nowActive ? 'أُضيفت للمفضلة' : 'أُزيلت من المفضلة', '"' + title + '"', 2500);
+      });
+    });
+  }
+
+  function initContinueBanner() {
+    const btn = $('continue-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      if (!lastCourseKey) return;
+      jumpToSubject(lastCourseKey);
+    });
+  }
+
+  function updateStats() {
+    const cards = $$('.course-card');
+    let totalLessons = 0;
+    cards.forEach(card => { totalLessons += parseInt(card.dataset.lessons || '0', 10); });
+    const coursesEl = document.querySelector('[data-stat="courses"]');
+    const lessonsEl = document.querySelector('[data-stat="lessons"]');
+    if (coursesEl) coursesEl.textContent = cards.length;
+    if (lessonsEl) lessonsEl.textContent = totalLessons;
+  }
+
+  /* ============================================================
+     AI ENGINE — Smart intent detection + reasoning
+     ============================================================ */
+  const SUBJECT_KEYWORDS = {
+    math: ['رياض', 'جبر', 'هندسة', 'مثلث', 'معادل', 'تفاضل', 'تكامل', 'رياضيات', 'math', 'equation', 'algebra'],
+    physics: ['فيزياء', 'حركة', 'قوة', 'طاقة', 'نيوتن', 'كهرباء', 'مغناطيس', 'physics'],
+    chemistry: ['كيمياء', 'تفاعل', 'عنصر', 'ذرة', 'رابطة', 'مول', 'chemistry', 'reaction'],
+    biology: ['أحياء', 'احياء', 'خلية', 'وراثة', 'DNA', 'biology', 'cell', 'gene'],
+    ar: ['عربي', 'نحو', 'صرف', 'بلاغ', 'أدب', 'قصيد', 'إعراب', 'قواعد'],
+    en: ['english', 'انجليزي', 'إنجليزي', 'grammar', 'vocab', 'tense'],
+    sci: ['علوم', 'science'],
+    history: ['تاريخ', 'حضارة', 'history'],
+    geography: ['جغرافيا', 'خرائط', 'مناخ', 'geography'],
+    philosophy: ['فلسفة', 'منطق', 'philosophy'],
+    psychology: ['نفس', 'اجتماع', 'سلوك', 'psychology'],
+    religion: ['دين', 'قرآن', 'تفسير', 'فقه', 'سيرة'],
+    it: ['حاسب', 'برمجة', 'كود', 'code', 'programming', 'python'],
+    french: ['français', 'فرنساوي', 'french'],
+    german: ['deutsch', 'ألماني', 'german'],
+    social: ['اجتماعيات', 'مواطنة'],
+    geology: ['جيولوجيا', 'صخور', 'geology'],
+    art: ['فن', 'رسم', 'تصميم', 'art'],
+    pe: ['رياضة', 'لياقة', 'sport'],
+  };
+
+  const INTENT_PATTERNS = [
+    { key:'plan', patterns:/(خطة|جدول|مذاكرة|تنظيم)/i },
+    { key:'quiz', patterns:/(اختبار|امتحن|كويز|quiz|test|تمرين)/i },
+    { key:'summary', patterns:/(لخص|اختصر|ملخص|summary)/i },
+    { key:'solve', patterns:/(حل|احسب|ساوي|solve|calculate|اوجد)/i },
+    { key:'explain', patterns:/(اشرح|فسر|وضح|يعني ايه|ايه هو|ايه هي|explain|اشرحلي)/i },
+    { key:'motivate', patterns:/(تعب|ملل|زهقت|صعب|مش قادر|مش فاهم|حزين)/i },
+    { key:'greet', patterns:/^(اهلا|أهلا|هاي|مرحبا|سلام|صباح|مساء|hi|hello|ايه اخبارك)/i },
+    { key:'thanks', patterns:/(شكرا|شكرًا|thanks|thank you|تسلم)/i },
+  ];
+
+  function detectIntent(q) {
+    for (const intent of INTENT_PATTERNS) {
+      if (intent.patterns.test(q)) return intent.key;
+    }
+    return 'chat';
+  }
+
+  function detectSubject(q) {
+    const lower = q.toLowerCase();
+    for (const key in SUBJECT_KEYWORDS) {
+      if (SUBJECT_KEYWORDS[key].some(kw => lower.includes(kw.toLowerCase()))) return key;
+    }
+    return null;
+  }
+
+  const SUBJECT_TIPS = {
+    math: ['قسّم المسألة لخطوات صغيرة', 'ارسم دايمًا قبل ما تحل', 'حل 3-5 مسائل من كل نوع'],
+    physics: ['افهم القانون قبل ما تحفظه', 'ارسم دايجرام للقوى', 'حوّل الوحدات بدقة'],
+    chemistry: ['افهم الجدول الدوري', 'موازنة المعادلات تدرب عليها', 'اربط النظري بالعملي'],
+    biology: ['افهم وظيفة كل عضية', 'ارسم مخططات للوراثة', 'استخدم القصص الذهنية'],
+    ar: ['احفظ القواعد بالأمثلة', 'اقرأ نصوص كتير', 'تدرب على الإعراب يوميًا'],
+    en: ['10 كلمات جديدة كل يوم', 'شاهد أفلام بترجمة', 'اكتب فقرة يوميًا'],
+  };
+
+  const INTENT_RESPONSES = {
+    plan: (subject) => `📅 خطة مذاكرة ذكية${subject ? ' لمادة ' + subject : ''}:\n\n**قبل ما تبدأ:**\n• جهّز كل المصادر (كتاب، نوتس، فيديوهات)\n• خد بريك كل 25 دقيقة (Pomodoro)\n• ابدأ بأصعب جزء وأنت فايق\n\n**قاعدة الـ3 للمراجعة:**\n• راجع بعد 24 ساعة\n• راجع بعد أسبوع\n• راجع بعد شهر\n\n💡 افتح تبويب "خطة" فوق وأنا هبنيلك جدول يومي مخصص!`,
+
+    quiz: (subject) => `📝 الاختبارات أفضل طريقة لتثبيت المعلومات!\n\n**نصيحة:**\n• ابدأ باختبار سهل عشان تبني ثقة\n• بعد كل غلطة، اعرف سببها\n• كرر الاختبار الصعب 3 مرات\n\n💡 افتح تبويب "اختبار" واختار ${subject ? '"' + subject + '"' : 'المادة'} وأنا هوّلدلك أسئلة فورًا.`,
+
+    summary: (subject) => `📚 التلخيص سر النجاح!\n\n**قواعد التلخيص الذكي:**\n• استخرج الأفكار الرئيسية فقط\n• استخدم نقاط بدل جمل طويلة\n• اكتب بكلماتك أنت\n\n💡 افتح تبويب "ملخص"، الصق النص، واختار الطول — هحوله لنقاط واضحة.`,
+
+    solve: (subject) => `🧮 هحل لك المسألة خطوة بخطوة!\n\n💡 افتح تبويب "حل" فوق، اكتب المسألة، وأنا هوضحلك:\n• الخطوة الأولى\n• الخطوة الثانية\n• الحل النهائي\n• سبب كل خطوة`,
+
+    motivate: () => `💪 أنا معاك! كلنا بنمر بلحظات صعبة.\n\n**افتكر:**\n• التقدم البطيء لسه تقدم\n• خد بريك 15 دقيقة\n• ارجع لدرس سهل وحله\n• قسّم المذاكرة لأجزاء صغيرة\n• اتكلم مع صاحبك أو مدرسك\n\n🌟 **حاجة مهمة:** كل خبراء الدنيا بدأوا من نقطة صعبة. أنت أقوى من كده!`,
+
+    greet: (subject) => `أهلًا بيك! ✨\nأنا مساعدك الذكي في أقدر.\n\nممكن أساعدك في:\n• شرح أي درس\n• حل مسائل خطوة بخطوة\n• عمل خطة مذاكرة\n• توليد اختبارات\n• تلخيص الدروس\n\nقولي محتاج إيه؟`,
+
+    thanks: () => `العفو! 💙\nأنا موجود دايمًا لو محتاج أي حاجة.\nبالتوفيق في دراستك! 🎯`,
+  };
+
+  function generateAIResponse(query) {
+    const q = query.trim();
+    if (!q) return 'اكتب سؤالك وأنا هجاوبك فورًا! 😊';
+
+    const intent = detectIntent(q);
+    const subjectKey = detectSubject(q);
+    const subjectTitle = subjectKey ? SUBJECTS.find(s => s.key === subjectKey)?.title : null;
+
+    // Special handling for explain with subject
+    if (intent === 'explain' && subjectKey) {
+      const tips = SUBJECT_TIPS[subjectKey] || ['ذاكر بانتظام', 'حل تمارين', 'راجع أول بأول'];
+      return `📖 **شرح ${subjectTitle}:**\n\n${tips.map((t, i) => `${i+1}. ${t}`).join('\n')}\n\n💡 **نصيحة إضافية:** ${tips[0]}\n\n🎯 عايز شرح أعمق؟ افتح تبويب "حل" أو "اشرح ببساطة" وأنا هفهمك بالتفصيل.`;
+    }
+
+    if (INTENT_RESPONSES[intent]) {
+      return INTENT_RESPONSES[intent](subjectTitle);
+    }
+
+    // Fallback smart response
+    return `سؤال ممتاز! 🤔\n\nعشان أقدر أساعدك بشكل أفضل:\n• **الموضوع** (رياضيات/فيزياء/عربي...)\n• **نوع المساعدة** (شرح / حل / ملخص / اختبار)\n\nأو جرّب تقولي:\n• "اشرح لي درس النحو"\n• "حل لي 2x + 5 = 13"\n• "اعمل لي خطة مذاكرة"\n• "ولد لي اختبار فيزياء"`;
+  }
+
+  function generateThinkingSteps(query) {
+    const intent = detectIntent(query);
+    const subjectKey = detectSubject(query);
+    const subjectTitle = subjectKey ? SUBJECTS.find(s => s.key === subjectKey)?.title : 'الموضوع';
+
+    const steps = ['أحلل سؤالك...'];
+
+    if (subjectKey) steps.push(`حددت المادة: ${subjectTitle}`);
+    if (intent === 'solve') {
+      steps.push('أفهم المعطيات والمطلوب');
+      steps.push('أختار الطريقة المناسبة');
+      steps.push('أبدأ الحل خطوة بخطوة');
+    } else if (intent === 'explain') {
+      steps.push('أبسط المفهوم');
+      steps.push('أجهز أمثلة توضيحية');
+    } else if (intent === 'plan') {
+      steps.push('أراعي مستواك ووقتك');
+      steps.push('أوزع المواضيع بذكاء');
+    } else if (intent === 'quiz') {
+      steps.push('أولّد أسئلة بمستويات مختلفة');
+    } else {
+      steps.push('أجهز أفضل إجابة');
+    }
+    return steps;
+  }
+
+  /* ============================================================
+     AI CHAT ENGINE
+     ============================================================ */
+  const chatHistory = [];
+
+  function addAIMessage(role, text, followups) {
+    const messagesEl = $('ai-messages');
+    if (!messagesEl) return;
+
+    const msg = document.createElement('div');
+    msg.className = 'ai-msg ai-msg--' + (role === 'user' ? 'user' : 'bot');
+    const bubbleContent = escapeHTML(text)
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+    let followupsHTML = '';
+    if (followups && followups.length) {
+      followupsHTML = '<div class="ai-followups">' +
+        followups.map(f => `<button type="button" class="ai-followup" data-prompt="${escapeHTML(f)}">${escapeHTML(f)}</button>`).join('') +
+        '</div>';
+    }
+
+    msg.innerHTML =
+      '<div class="ai-msg__avatar">' + (role === 'user' ? '👤' : '✨') + '</div>' +
+      '<div class="ai-msg__bubble">' + bubbleContent + followupsHTML + '</div>';
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    msg.querySelectorAll('.ai-followup').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.getAttribute('data-prompt');
+        if ($('ai-input')) {
+          $('ai-input').value = prompt;
+          handleAISend();
+        }
+      });
+    });
+
+    chatHistory.push({ role, text });
+  }
+
+  async function showThinkingSteps(query) {
+    const messagesEl = $('ai-messages');
+    if (!messagesEl) return;
+
+    const steps = generateThinkingSteps(query);
+    const thinking = document.createElement('div');
+    thinking.className = 'ai-thinking';
+    thinking.innerHTML = '<div class="ai-thinking__title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L14 8 L20 10 L14 12 L12 18 L10 12 L4 10 L10 8 Z"/></svg>أفكر...</div>';
+
+    messagesEl.appendChild(thinking);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    for (let i = 0; i < steps.length; i++) {
+      await sleep(350);
+      const stepEl = document.createElement('div');
+      stepEl.className = 'ai-thinking__step';
+      stepEl.textContent = steps[i];
+      thinking.appendChild(stepEl);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    await sleep(300);
+    thinking.remove();
+  }
+
+  function generateFollowups(intent, subject) {
+    if (intent === 'solve' || intent === 'explain') {
+      return subject ? [`اشرح ببساطة`, `ولد اختبار في ${subject}`] : [`اشرح ببساطة`, `ولد اختبار`];
+    }
+    if (intent === 'plan') return ['ولد اختبار سريع', 'اشرح لي درس'];
+    if (intent === 'quiz') return ['صحح إجاباتي', 'اعمل خطة مذاكرة'];
+    return ['اشرح ببساطة', 'اعمل خطة', 'ولد اختبار'];
+  }
+
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  async function handleAISend() {
+    const input = $('ai-input');
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+
+    addAIMessage('user', text);
+    addXP(2);
+
+    // Show thinking steps
+    await showThinkingSteps(text);
+
+    // Show typing
+    const typing = showAITyping();
+
+    await sleep(500);
+
+    if (typing) typing.remove();
+
+    const intent = detectIntent(text);
+    const subjectKey = detectSubject(text);
+    const subjectTitle = subjectKey ? SUBJECTS.find(s => s.key === subjectKey)?.title : null;
+
+    addAIMessage('bot', generateAIResponse(text), generateFollowups(intent, subjectTitle));
+  }
+
+  function showAITyping() {
+    const messagesEl = $('ai-messages');
+    if (!messagesEl) return null;
+    const typing = document.createElement('div');
+    typing.className = 'ai-msg ai-msg--bot';
+    typing.innerHTML =
+      '<div class="ai-msg__avatar">✨</div>' +
+      '<div class="ai-typing"><span></span><span></span><span></span></div>';
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return typing;
+  }
+
+  function initAIChat() {
+    const input = $('ai-input');
+    const sendBtn = $('ai-send');
+    const micBtn = $('ai-mic');
+    if (!input || !sendBtn) return;
+
+    sendBtn.addEventListener('click', handleAISend);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAISend(); }
+    });
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+    });
+
+    // Voice input (Web Speech API)
+    if (micBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SR();
+      recognition.lang = 'ar-EG';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      let isRecording = false;
+
+      micBtn.addEventListener('click', () => {
+        if (isRecording) {
+          recognition.stop();
+          return;
+        }
+        try {
+          recognition.start();
+          isRecording = true;
+          micBtn.classList.add('is-recording');
+          announce('بدأ الاستماع...');
+        } catch (e) { console.warn(e); }
+      });
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        input.value = transcript;
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+        showToast('success', '🎤 تم التعرف على صوتك', transcript, 2500);
+      };
+
+      recognition.onerror = (event) => {
+        isRecording = false;
+        micBtn.classList.remove('is-recording');
+        showToast('error', 'خطأ في الميكروفون', 'ممكن ما يكونش شغال في المتصفح ده', 3000);
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('is-recording');
+      };
+    } else if (micBtn) {
+      micBtn.style.display = 'none';
+    }
+
+    $$('.ai-suggestion').forEach(btn => {
+      btn.addEventListener('click', () => {
+        input.value = btn.getAttribute('data-prompt');
+        handleAISend();
+      });
+    });
+
+    // Greeting
+    setTimeout(() => {
+      const name = window.__aqdarUser?.fullName?.split(' ')[0] || 'يا بطل';
+      addAIMessage('bot',
+        `أهلًا ${name}! ✨\nأنا مساعدك الذكي في أقدر — مش بس بجاوب، أنا بفكر معك!\n\nممكن أساعدك في:\n• **شرح** أي درس ببساطة\n• **حل** مسائل خطوة بخطوة\n• **خطة** مذاكرة مخصصة\n• **اختبارات** فورية\n• **تلخيص** دروسك\n\nقولي محتاج إيه؟`,
+        ['اشرح ببساطة', 'اعمل خطة', 'ولد اختبار']
+      );
+    }, 400);
+  }
+
+  /* ============================================================
+     AI PANEL
+     ============================================================ */
+  function openAIPanel(initialTab) {
+    const panel = $('ai-panel');
+    const fab = $('ai-fab');
+    if (!panel || !fab) return;
+    panel.hidden = false;
+    fab.setAttribute('aria-expanded', 'true');
+    if (initialTab) switchAITab(initialTab);
+    setTimeout(() => { $('ai-input')?.focus(); }, 300);
+  }
+
+  function closeAIPanel() {
+    const panel = $('ai-panel');
+    const fab = $('ai-fab');
+    if (!panel || !fab) return;
+    panel.hidden = true;
+    fab.setAttribute('aria-expanded', 'false');
+    fab.focus();
+  }
+
+  function switchAITab(tabName) {
+    // map legacy tool names to tab names
+    const map = { solve:'solve', chat:'chat', plan:'plan', quiz:'quiz', summary:'summary', recommend:'recommend', explain:'chat', insights:'recommend' };
+    const target = map[tabName] || tabName;
+    $$('.ai-tab').forEach(t => t.setAttribute('aria-selected', t.getAttribute('data-tab') === target ? 'true' : 'false'));
+    $$('.ai-pane').forEach(p => p.hidden = true);
+    const chatPane = $('pane-chat');
+    const targetPane = $('pane-' + target);
+    if (target === 'chat' && chatPane) chatPane.hidden = false;
+    else if (targetPane) targetPane.hidden = false;
+    else if (chatPane) chatPane.hidden = false;
+  }
+
+  function initAIPanel() {
+    const fab = $('ai-fab');
+    const closeBtn = $('ai-close');
+    const pill = $('ai-pill');
+
+    if (fab) {
+      fab.addEventListener('click', () => {
+        if ($('ai-panel')?.hidden) openAIPanel(); else closeAIPanel();
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', closeAIPanel);
+    if (pill) pill.addEventListener('click', () => openAIPanel('chat'));
+
+    $$('.ai-tab').forEach(tab => {
+      tab.addEventListener('click', () => switchAITab(tab.getAttribute('data-tab')));
+    });
+
+    $$('.ai-tool').forEach(tool => {
+      tool.addEventListener('click', () => {
+        const toolName = tool.getAttribute('data-ai-tool');
+        if (toolName === 'explain') {
+          openAIPanel('chat');
+          setTimeout(() => {
+            if ($('ai-input')) {
+              $('ai-input').value = 'اشرح ببساطة';
+              $('ai-input').focus();
+            }
+          }, 300);
+        } else if (toolName === 'insights') {
+          openAIPanel('recommend');
+          setTimeout(() => {
+            const out = $('reco-output');
+            if (out) out.innerHTML = generateInsights();
+          }, 400);
+        } else {
+          openAIPanel(toolName);
+        }
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('ai-panel')?.hidden) {
+        const active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
+        closeAIPanel();
+      }
+      if (e.key.toLowerCase() === 'a' && !e.ctrlKey && !e.metaKey) {
+        const tag = (document.activeElement?.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if ($('ai-panel')?.hidden) openAIPanel();
+      }
+    });
+  }
+
+  /* ============================================================
+     STUDY PLAN
+     ============================================================ */
+  const TOPICS = {
+    ar:['النحو الأساسي','الصرف','البلاغة','الأدب الحديث','التعبير الكتابي','قواعد الإعراب','القراءة المتحررة'],
+    en:['Grammar Tenses','Vocabulary Building','Reading Comprehension','Writing Skills','Listening Practice','Speaking Drills'],
+    math:['الجبر','المعادلات','الهندسة','حساب المثلثات','التفاضل','التكامل','الإحصاء'],
+    sci:['الفيزياء الأساسية','الكيمياء','الأحياء','التجارب العملية','حل المسائل'],
+    social:['التاريخ المصري','الجغرافيا','المواطنة','الاقتصاد'],
+    religion:['القرآن والتفسير','الحديث','الفقه','السيرة النبوية','الأخلاق'],
+    it:['أساسيات البرمجة','التفكير الحاسوبي','الأمن الرقمي','تطبيقات عملية'],
+    skills:['مهارات التواصل','التفكير النقدي','إدارة الوقت','ريادة الأعمال'],
+    art:['الرسم','التصميم','التذوق الفني','تاريخ الفن'],
+    pe:['اللياقة البدنية','الرياضات الجماعية','التغذية','الإصابات الرياضية'],
+  };
+
+  function generateStudyPlan(subjectKey, days, hoursPerDay, level) {
+    const subject = SUBJECTS.find(s => s.key === subjectKey);
+    const topics = TOPICS[subjectKey] || ['مراجعة','تمارين','امتحان تجريبي'];
+    const title = subject ? subject.title : 'المادة';
+    const perDay = Math.max(1, Math.ceil(topics.length / Math.max(1, Math.floor(days / 3))));
+
+    let output = '<h4>📅 خطة مخصصة لمادة ' + title + '</h4>';
+    output += '<p><strong>المدة:</strong> ' + days + ' يوم · <strong>يوميًا:</strong> ' + hoursPerDay + ' ساعة · <strong>المستوى:</strong> ' + (level === 'beginner' ? 'مبتدئ' : level === 'advanced' ? 'متقدم' : 'متوسط') + '</p>';
+    output += '<p><strong>المواضيع:</strong></p><ul>';
+    topics.forEach(t => { output += '<li>' + t + '</li>'; });
+    output += '</ul><p><strong>توزيع الأيام:</strong></p><ul>';
+
+    const cycle = ['دراسة نظرية', 'حل تمارين', 'مراجعة + اختبار قصير'];
+    let topicIndex = 0;
+    for (let d = 1; d <= Math.min(days, 14); d++) {
+      const phase = cycle[(d - 1) % 3];
+      const currentTopics = topics.slice(topicIndex, topicIndex + perDay);
+      topicIndex = (topicIndex + perDay) % topics.length;
+      if (!currentTopics.length) currentTopics.push(topics[0]);
+      output += '<li><strong>يوم ' + d + ':</strong> ' + currentTopics.join(' + ') + ' — <em>' + phase + '</em></li>';
+    }
+    if (days > 14) output += '<li>... (باقي الأيام على نفس النمط)</li>';
+    output += '</ul><p>💡 <strong>نصيحة:</strong> خد راحة 15 دقيقة كل ساعتين، وراجع كل درس بعد 24 ساعة.</p>';
+    return output;
+  }
+
+  /* ============================================================
+     QUIZ BANK
+     ============================================================ */
+  const QUIZ_BANK = {
+    math: {
+      easy: [
+        { q: 'ما هو حل المعادلة: 2x + 5 = 13؟', opts: ['x = 4','x = 5','x = 3','x = 6'], correct: 0 },
+        { q: 'ما ناتج 7 × 8؟', opts: ['54','56','63','48'], correct: 1 },
+        { q: 'كم ضلع في المثلث؟', opts: ['2','3','4','5'], correct: 1 },
+        { q: 'ما هو الجذر التربيعي لـ 25؟', opts: ['4','5','6','3'], correct: 1 },
+      ],
+      medium: [
+        { q: 'إذا كان (x + 3)² = 25، فما قيمة x الممكنة؟', opts: ['2 أو -8','-2 أو 8','5','-5'], correct: 0 },
+        { q: 'ما هو ميل الخط المستقيم المار بـ (1,2) و (4,8)؟', opts: ['1','2','3','4'], correct: 1 },
+        { q: 'ما هو مجموع زوايا المثلث؟', opts: ['90°','180°','270°','360°'], correct: 1 },
+      ],
+      hard: [
+        { q: 'ما مشتقة (3x² + 2x + 1)؟', opts: ['6x + 2','3x + 2','6x','3x²'], correct: 0 },
+        { q: 'ما تكامل (2x) dx؟', opts: ['x²','2x²','x² + C','2x + C'], correct: 2 },
+      ]
+    },
+    physics: {
+      easy: [
+        { q: 'ما وحدة قياس القوة؟', opts: ['نيوتن','جول','واط','أمبير'], correct: 0 },
+        { q: 'ما سرعة الضوء في الفراغ؟', opts: ['3×10⁸ m/s','3×10⁶ m/s','3×10¹⁰ m/s','3×10⁴ m/s'], correct: 0 },
+      ],
+      medium: [
+        { q: 'قانون نيوتن الثاني:', opts: ['F = ma','E = mc²','V = IR','P = F/A'], correct: 0 },
+        { q: 'ما وحدة قياس الطاقة؟', opts: ['نيوتن','جول','واط','أمبير'], correct: 1 },
+      ],
+      hard: [
+        { q: 'جسم كتلته 2kg يتحرك بتسارع 5 m/s². القوة =', opts: ['10 N','7 N','3 N','2.5 N'], correct: 0 },
+      ]
+    },
+    chemistry: {
+      easy: [
+        { q: 'ما الرمز الكيميائي للماء؟', opts: ['H₂O','CO₂','O₂','NaCl'], correct: 0 },
+        { q: 'ما العدد الذري للكربون؟', opts: ['6','12','14','8'], correct: 0 },
+      ],
+      medium: [
+        { q: 'ما نوع الرابطة في NaCl؟', opts: ['أيونية','تساهمية','فلزية','هيدروجينية'], correct: 0 },
+      ],
+      hard: [
+        { q: 'ما عدد مولات الماء في 36 جرام؟', opts: ['1','2','3','4'], correct: 1 },
+      ]
+    },
+    biology: {
+      easy: [
+        { q: 'ما العضية المسؤولة عن إنتاج الطاقة؟', opts: ['الميتوكوندريا','النواة','الرايبوسوم','الغشاء'], correct: 0 },
+        { q: 'ما الحمض النووي المسؤول عن الوراثة؟', opts: ['DNA','RNA','ATP','ADP'], correct: 0 },
+      ],
+      medium: [
+        { q: 'العملية التي تصنع بها النباتات غذاءها؟', opts: ['البناء الضوئي','التنفس','الانقسام','النتح'], correct: 0 },
+      ],
+      hard: [
+        { q: 'ما الطور الذي تتضاعف فيه الكروموسومات؟', opts: ['الطور البيني','الطور التمهيدي','الطور الاستوائي','الطور النهائي'], correct: 0 },
+      ]
+    },
+    ar: {
+      easy: [
+        { q: 'ما نوع كلمة "الكتاب"؟', opts: ['معرفة','نكرة','فعل','حرف'], correct: 0 },
+        { q: 'ما جمع كلمة "طالب"؟', opts: ['طلاب','طالبون','طالبين','طوالب'], correct: 0 },
+      ],
+      medium: [
+        { q: '"كتب الطالب الدرس" — إعراب "الطالب"؟', opts: ['فاعل مرفوع','مفعول به منصوب','مبتدأ مرفوع','خبر مرفوع'], correct: 0 },
+      ],
+      hard: [
+        { q: 'الصورة البلاغية في "العلم نور"؟', opts: ['تشبيه بليغ','استعارة','كناية','مجاز مرسل'], correct: 0 },
+      ]
+    },
+    en: {
+      easy: [
+        { q: 'Past tense of "go":', opts: ['goed','went','gone','going'], correct: 1 },
+        { q: 'Plural of "child":', opts: ['childs','childes','children','childrens'], correct: 2 },
+      ],
+      medium: [
+        { q: 'Choose the correct sentence:', opts: ['She don\'t like coffee','She doesn\'t like coffee','She not like coffee','She no likes coffee'], correct: 1 },
+      ],
+      hard: [
+        { q: 'If I ___ rich, I would travel the world.', opts: ['am','was','were','be'], correct: 2 },
+      ]
+    },
+  };
+
+  function generateQuiz(subjectKey, difficulty) {
+    const bank = QUIZ_BANK[subjectKey];
+    if (!bank) {
+      return '<div class="ai-quiz-q"><p class="ai-quiz-q__title">⚠️ الأسئلة لهذه المادة قيد التطوير</p><p style="font-size:.8rem;color:var(--ink-mute);">جرب مادة أخرى مثل: الرياضيات، الفيزياء، الكيمياء، الأحياء، العربي، الإنجليزي.</p></div>';
+    }
+    const questions = bank[difficulty] || bank.medium || bank.easy;
+    return questions.map((q, i) => {
+      const optsHTML = q.opts.map((opt, oi) =>
+        `<button type="button" class="ai-quiz-opt" data-q="${i}" data-opt="${oi}" data-correct="${oi === q.correct ? '1' : '0'}">${opt}</button>`
+      ).join('');
+      return `<div class="ai-quiz-q"><p class="ai-quiz-q__title">س${i+1}. ${q.q}</p><div class="ai-quiz-opts">${optsHTML}</div></div>`;
+    }).join('');
+  }
+
+  /* ============================================================
+     SUMMARY
+     ============================================================ */
+  function generateSummary(text, length) {
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length < 10) return '⚠️ النص قصير جدًا. الصق نصًا أطول للحصول على ملخص مفيد.';
+    const sentences = text.split(/[.!?؟。]+/).map(s => s.trim()).filter(s => s.length > 20);
+    const count = length === 'short' ? Math.min(3, sentences.length) : length === 'long' ? Math.min(8, sentences.length) : Math.min(5, sentences.length);
+    let output = '<h4>📝 ملخص النص</h4><ul>';
+    for (let i = 0; i < count; i++) {
+      const s = sentences[i] || '';
+      if (s) output += '<li>' + s.slice(0, 200) + (s.length > 200 ? '...' : '') + '</li>';
+    }
+    output += '</ul><p>💡 <strong>إحصائيات:</strong> النص فيه ' + words.length + ' كلمة، الملخص فيه ' + count + ' نقاط رئيسية.</p>';
+    return output;
+  }
+
+  /* ============================================================
+     STEP-BY-STEP SOLVER
+     ============================================================ */
+  function solveStepByStep(query, subject) {
+    const q = query.trim();
+    if (!q) return '⚠️ اكتب المسألة أول.';
+
+    // Linear equation ax + b = c
+    const linearMatch = q.match(/(-?\d+)\s*[xX]\s*([+\-])\s*(\d+)\s*=\s*(-?\d+)/);
+    if (linearMatch) {
+      const a = parseFloat(linearMatch[1]);
+      const op = linearMatch[2];
+      const b = parseFloat(linearMatch[3]) * (op === '+' ? 1 : -1);
+      const c = parseFloat(linearMatch[4]);
+      const x = (c - b) / a;
+
+      return `
+        <h4>🧮 حل المعادلة: ${a}x ${op} ${Math.abs(b)} = ${c}</h4>
+        <div class="step"><span class="step__num">1</span><div><strong>الخطوة الأولى:</strong> ننقل الحد الثابت للطرف الآخر<br>${a}x = ${c} ${b >= 0 ? '-' : '+'} ${Math.abs(b)}<br>${a}x = ${c - b}</div></div>
+        <div class="step"><span class="step__num">2</span><div><strong>الخطوة الثانية:</strong> نقسم على معامل x<br>x = ${c - b} ÷ ${a}<br><strong>x = ${x}</strong></div></div>
+        <p>✅ <strong>الحل:</strong> x = ${x}</p>
+        <p>💡 <strong>للتحقق:</strong> ${a}(${x}) ${op} ${Math.abs(b)} = ${a * x + b} ${a * x + b === c ? '✓' : '✗'}</p>
+      `;
+    }
+
+    // Derivative
+    const derivMatch = q.match(/(?:مشتقة|derivative|اشتق)\s*\(?\s*(-?\d*)\s*[xX]\s*(?:\^?\s*(\d+))?\s*\)?/);
+    if (derivMatch) {
+      const a = parseFloat(derivMatch[1] || '1');
+      const n = parseFloat(derivMatch[2] || '1');
+      const result = a * n;
+      const newPow = n - 1;
+      return `
+        <h4>🧮 إيجاد المشتقة</h4>
+        <div class="step"><span class="step__num">1</span><div><strong>القاعدة:</strong> مشتقة ax^n = a·n·x^(n-1)</div></div>
+        <div class="step"><span class="step__num">2</span><div><strong>نطبق:</strong> a = ${a}, n = ${n}<br>النتيجة = ${a} × ${n} × x^${newPow} = ${result}x${newPow !== 1 ? '^' + newPow : ''}</div></div>
+        <p>✅ <strong>الإجابة:</strong> ${result}x${newPow !== 0 ? '^' + newPow : ''}</p>
+      `;
+    }
+
+    // Physics - simple
+    if (subject === 'physics' && /F\s*=\s*m\s*a|قوة/i.test(q)) {
+      return `
+        <h4>⚛️ حل مسألة فيزياء</h4>
+        <div class="step"><span class="step__num">1</span><div><strong>القانون:</strong> القوة = الكتلة × التسارع (F = m·a)</div></div>
+        <div class="step"><span class="step__num">2</span><div><strong>خطوات الحل:</strong><br>1. عيّن الكتلة (m)<br>2. عيّن التسارع (a)<br>3. اضرب m × a</div></div>
+        <p>💡 <strong>مثال:</strong> لو m=2kg, a=5m/s² ← F = 2×5 = 10 نيوتن</p>
+        <p>⚠️ اكتب الأرقام في مسألتك للحل الفوري.</p>
+      `;
+    }
+
+    // Generic
+    return `
+      <h4>🤔 محتاج توضيح أكتر</h4>
+      <p>المسألة مش واضحة بشكل كافي. جرب تقولي:</p>
+      <ul>
+        <li><strong>رياضيات:</strong> 2x + 5 = 13</li>
+        <li><strong>مشتقة:</strong> مشتقة 3x²</li>
+        <li><strong>فيزياء:</strong> F = ma مع الأرقام</li>
+      </ul>
+      <p>أو افتح <strong>محادثة</strong> وأنا أساعدك بذكاء.</p>
+    `;
+  }
+
+  /* ============================================================
+     RECOMMENDATIONS & INSIGHTS
+     ============================================================ */
+  function generateRecommendations() {
+    const bookmarks = getBookmarks();
+    const progressMap = {};
+    document.querySelectorAll('.course-card').forEach(card => {
+      progressMap[card.getAttribute('data-course')] = parseInt(card.getAttribute('data-progress') || '0', 10);
+    });
+
+    let recs = [];
+    SUBJECTS.forEach(s => {
+      if (progressMap[s.key] === 0) {
+        recs.push({ ...s, reason: 'لم تبدأها بعد — ابدأها النهاردة!' });
+      } else if (progressMap[s.key] < 30) {
+        recs.push({ ...s, reason: 'تقدمك ' + progressMap[s.key] + '% — محتاج شوية تركيز.' });
+      } else if (bookmarks.includes(s.key)) {
+        recs.push({ ...s, reason: 'موجودة في مفضلتك — كمّل!' });
+      }
+    });
+
+    recs = recs.slice(0, 5);
+    if (!recs.length) recs = SUBJECTS.slice(0, 5).map(s => ({ ...s, reason: 'مادة مهمة لكل طالب.' }));
+
+    return recs.map(r => `
+      <div class="ai-reco">
+        <div class="ai-reco__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[r.icon] || ICONS.book}</svg>
+        </div>
+        <div class="ai-reco__body">
+          <p class="ai-reco__title">${r.emoji} ${r.title}</p>
+          <p class="ai-reco__reason">${r.reason}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function generateInsights() {
+    const cards = document.querySelectorAll('.course-card');
+    let started = 0, completed = 0, totalProgress = 0;
+    cards.forEach(card => {
+      const p = parseInt(card.getAttribute('data-progress') || '0', 10);
+      if (p > 0) started++;
+      if (p >= 100) completed++;
+      totalProgress += p;
+    });
+    const avg = (totalProgress / cards.length).toFixed(1);
+
+    return `<h4>📊 تحليل أدائك</h4>
+      <ul>
+        <li><strong>المواد المبدوءة:</strong> ${started} من ${cards.length}</li>
+        <li><strong>المواد المكتملة:</strong> ${completed}</li>
+        <li><strong>متوسط التقدم:</strong> ${avg}%</li>
+      </ul>
+      <p>💡 <strong>توصية:</strong> ${avg < 30 ? 'محتاج تبدأ رحلتك! اختار مادة واحدة والتزم بيها أسبوع.' : avg < 70 ? 'أنت في الطريق الصح! كمل بنفس الحماس.' : 'ممتاز! أنت من الطلاب المتميزين. جرّب مواد جديدة.'}</p>`;
+  }
+
+  /* ============================================================
+     WIRE AI TOOLS
+     ============================================================ */
+  function initAITools() {
+    // Plan
+    const planBtn = $('plan-generate');
+    if (planBtn) {
+      planBtn.addEventListener('click', () => {
+        const subj = $('plan-subject')?.value;
+        const days = parseInt($('plan-days')?.value || '14', 10);
+        const hours = parseInt($('plan-hours')?.value || '2', 10);
+        const level = $('plan-level')?.value || 'intermediate';
+        if (!subj) return;
+        const out = $('plan-output');
+        if (out) out.innerHTML = '<em>⏳ جاري توليد الخطة...</em>';
+        planBtn.disabled = true;
+        setTimeout(() => {
+          if (out) out.innerHTML = generateStudyPlan(subj, days, hours, level);
+          planBtn.disabled = false;
+          addXP(5);
+        }, 900);
+      });
+    }
+
+    // Quiz
+    const quizBtn = $('quiz-generate');
+    if (quizBtn) {
+      quizBtn.addEventListener('click', () => {
+        const subj = $('quiz-subject')?.value;
+        const diff = $('quiz-difficulty')?.value || 'medium';
+        if (!subj) return;
+        const out = $('quiz-output');
+        if (out) out.innerHTML = '<em>⏳ جاري توليد الأسئلة...</em>';
+        quizBtn.disabled = true;
+        setTimeout(() => {
+          if (out) {
+            out.innerHTML = generateQuiz(subj, diff);
+            out.querySelectorAll('.ai-quiz-opt').forEach(btn => {
+              btn.addEventListener('click', () => {
+                if (btn.disabled) return;
+                const isCorrect = btn.getAttribute('data-correct') === '1';
+                btn.classList.add(isCorrect ? 'correct' : 'wrong');
+                btn.disabled = true;
+                if (isCorrect) addXP(5);
+                if (!isCorrect) {
+                  const sib = btn.parentElement.querySelectorAll('.ai-quiz-opt');
+                  sib.forEach(b => {
+                    if (b.getAttribute('data-correct') === '1') b.classList.add('correct');
+                    b.disabled = true;
+                  });
+                }
+              });
+            });
+          }
+          quizBtn.disabled = false;
+          addXP(3);
+        }, 1000);
+      });
+    }
+
+    // Summary
+    const sumBtn = $('summary-generate');
+    if (sumBtn) {
+      sumBtn.addEventListener('click', () => {
+        const text = $('summary-input')?.value || '';
+        const len = $('summary-length')?.value || 'medium';
+        const out = $('summary-output');
+        if (out) out.innerHTML = '<em>⏳ جاري التلخيص...</em>';
+        sumBtn.disabled = true;
+        setTimeout(() => {
+          if (out) out.innerHTML = generateSummary(text, len);
+          sumBtn.disabled = false;
+          addXP(3);
+        }, 800);
+      });
+    }
+
+    // Solve
+    const solveBtn = $('solve-generate');
+    if (solveBtn) {
+      solveBtn.addEventListener('click', () => {
+        const q = $('solve-input')?.value || '';
+        const subj = $('solve-subject')?.value || 'math';
+        const out = $('solve-output');
+        if (out) out.innerHTML = '<em>⏳ جاري الحل...</em>';
+        solveBtn.disabled = true;
+        setTimeout(() => {
+          if (out) out.innerHTML = solveStepByStep(q, subj);
+          solveBtn.disabled = false;
+          addXP(5);
+        }, 900);
+      });
+    }
+
+    // Recommendations
+    const recoBtn = $('reco-generate');
+    if (recoBtn) {
+      recoBtn.addEventListener('click', () => {
+        const out = $('reco-output');
+        if (out) out.innerHTML = '<em>⏳ جاري تحليل بياناتك...</em>';
+        recoBtn.disabled = true;
+        setTimeout(() => {
+          if (out) out.innerHTML = generateRecommendations();
+          recoBtn.disabled = false;
+        }, 900);
+      });
+    }
+  }
+
+  /* ============================================================
+     POMODORO TIMER
+     ============================================================ */
+  function initPomodoro() {
+    const display = $('pomodoro-time');
+    const btn = $('pomodoro-btn');
+    if (!display || !btn) return;
+
+    let remaining = 25 * 60;
+    let timerId = null;
+    let isRunning = false;
+
+    function update() {
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      display.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function tick() {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(timerId);
+        isRunning = false;
+        btn.textContent = 'ابدأ';
+        display.textContent = '00:00';
+        addXP(15);
+        showToast('success', '🍅 انتهت جلسة Pomodoro!', 'خد بريك 5 دقايق وارجع ( +15 XP )', 5000);
+        return;
+      }
+      update();
+    }
+
+    btn.addEventListener('click', () => {
+      if (isRunning) {
+        clearInterval(timerId);
+        isRunning = false;
+        btn.textContent = 'استمر';
+      } else {
+        isRunning = true;
+        btn.textContent = 'وقف';
+        timerId = setInterval(tick, 1000);
+      }
+    });
+
+    update();
+  }
+
+  /* ============================================================
+     INIT
+     ============================================================ */
+  async function init() {
+    const app = $('app');
+    if (app) app.hidden = true;
+
+    renderSubjects();
+
+    initTheme();
+    initBackToTop();
+    initUserMenu();
+    initLogout();
+    initContinueBanner();
+    initAIChat();
+    initAIPanel();
+    initAITools();
+    initLiveBar();
+    rotateActivity();
+    initPomodoro();
+
+    const client = getSupabase();
+    if (!client) {
+      console.error('[AQDAR] Supabase client unavailable.');
+      redirectToLogin();
+      return;
+    }
+
+    try {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      const user = sessionData?.session?.user;
+      if (!user) { redirectToLogin(); return; }
+
+      const { data: profile, error: profileError } = await client
+        .from('profiles')
+        .select('id, role, status, username, display_name, first_name, last_name')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+      if (!profile) { redirectToLogin(); return; }
+      if (profile.role !== 'student') { redirectToLogin(); return; }
+      if (profile.status !== 'active') { redirectToLogin(); return; }
+
+      fillUserInfo(user, profile);
+      showApp();
+
+      restorePreferences();
+      syncBookmarkButtons();
+      updateFilterCounts();
+      updateStats();
+      initToolbar();
+      initCourseCards();
+      applySort();
+      applyView();
+      updateContinueBanner();
+      renderQuickDock();
+      updateGreeting();
+
+      client.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT' || !session?.user) { redirectToLogin(); return; }
+        if (event === 'USER_UPDATED') fillUserInfo(session.user, profile);
+      });
+
+    } catch (error) {
+      console.error('[AQDAR] Session/Profile authorization failed:', error);
+      redirectToLogin();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+
+</body>
+</html>
