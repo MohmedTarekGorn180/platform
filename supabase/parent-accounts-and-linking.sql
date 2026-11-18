@@ -26,6 +26,23 @@ create trigger aqdar_signup_role_on_profile
 before insert on public.profiles
 for each row execute function public.aqdar_apply_signup_role();
 
+-- Prevent a regular authenticated user from promoting their own profile to staff/admin.
+create or replace function public.aqdar_protect_profile_role()
+returns trigger language plpgsql security definer set search_path = public
+as $
+begin
+  if auth.uid() is not null and auth.uid() = old.id
+     and not public.aqdar_is_admin() then
+    new.role := old.role;
+  end if;
+  return new;
+end;
+$;
+drop trigger if exists aqdar_protect_profile_role_trigger on public.profiles;
+create trigger aqdar_protect_profile_role_trigger
+before update of role on public.profiles
+for each row execute function public.aqdar_protect_profile_role();
+
 create table if not exists public.student_link_codes (
   student_id uuid primary key references public.profiles(id) on delete cascade,
   code text not null unique,
