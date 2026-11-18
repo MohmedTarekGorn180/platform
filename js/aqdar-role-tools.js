@@ -9,7 +9,7 @@
     try {
       if (window.supabase?.createClient) {
         const url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : 'https://khjqgpbyyexbgakvajhj.supabase.co');
-        const key = (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoanFncGJ5eWV4bgYha2V2YWpoaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzkyNTg3MzExLCJleHAiOjIxMDgxNjMzMTF9.7kd44Ye1dyZZnVq8bcCVj0t1DWhAnkLkhpYA5Ndln6U');
+        const key = (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoanFncGJ5eWV4Ymdha3ZhamhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1ODczMTEsImV4cCI6MjEwODE2MzMxMX0.7kd44Ye1dyZZnVq8bcCVj0t1DWhAnkLkhpYA5Ndln6U');
         return window.supabase.createClient(url, key);
       }
     } catch (_) {}
