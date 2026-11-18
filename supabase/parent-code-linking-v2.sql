@@ -232,7 +232,7 @@ begin
 
       if has_student_id then
         policy_name := 'parent reads linked student ' || tbl_name;
-        execute format('drop policy if exists %I on public.%I', policy_name, table_name);
+        execute format('drop policy if exists %I on public.%I', policy_name, tbl_name);
         execute format(
           'create policy %I on public.%I for select to authenticated using ' ||
           '(exists (select 1 from public.parent_students ps where ps.parent_id = auth.uid() and ps.student_id = %I.student_id and ps.active = true))',
