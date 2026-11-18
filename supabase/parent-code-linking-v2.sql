@@ -125,7 +125,7 @@ begin
     raise exception 'إنشاء الكود متاح لحساب الطالب فقط';
   end if;
 
-  generated_code := 'AQD-' || upper(encode(gen_random_bytes(6), 'hex'));
+  generated_code := 'AQD-' || upper(encode(gen_random_bytes(10), 'hex'));
 
   insert into public.student_link_codes
     (student_id, code, code_hash, created_at, expires_at, active, redeemed_at, redeemed_by)
@@ -163,7 +163,7 @@ begin
     raise exception 'ربط الطالب متاح لحساب ولي الأمر فقط';
   end if;
 
-  if normalized_code !~ '^AQD-[A-F0-9]{12}$' then
+  if normalized_code !~ '^AQD-[A-F0-9]{20}$' then
     raise exception 'صيغة الكود غير صحيحة';
   end if;
 
