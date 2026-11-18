@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b2b6b"><title>لوحة ولي الأمر | أقدر</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+:root{--navy:#0b2b6b;--blue:#1248b8;--cyan:#12b6d8;--bg:#f2f6ff;--ink:#10244b;--muted:#7182a2;--line:#e0e8f5;--surface:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Tahoma,sans-serif;min-height:100vh}
+main{max-width:1180px;margin:30px auto;padding:0 18px 50px}.welcome{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:22px 0}.welcome h1{margin:0;font-size:clamp(22px,4vw,32px)}.welcome p{color:var(--muted);margin:4px 0}
+.btn{border:0;border-radius:11px;padding:10px 16px;background:var(--blue);color:#fff;font:700 13px Cairo;cursor:pointer}.btn.secondary{background:#e8effc;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 6px 22px #153d7c08}.stat small{color:var(--muted);font-weight:700}.stat strong{display:block;font-size:27px;margin-top:6px}.section{margin-top:18px}.section h2{font-size:18px;margin:0 0 12px}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.muted{color:var(--muted)}.subject{padding:13px 0;border-bottom:1px solid var(--line)}.subject:last-child{border:0}.subject-head{display:flex;justify-content:space-between;gap:10px;font-weight:700}.track{height:9px;background:#eaf0fa;border-radius:99px;overflow:hidden;margin-top:9px}.fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:99px}.activity{padding:10px 0;border-bottom:1px solid var(--line)}.activity:last-child{border:0}.empty{text-align:center;padding:25px;color:var(--muted)}.notice{background:#fff8e6;border:1px solid #f2dfa7;color:#76520b;border-radius:13px;padding:12px;margin:14px 0}.hidden{display:none!important}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}}@media(max-width:480px){.welcome{align-items:flex-start;flex-direction:column}.grid{gap:9px}.card{padding:13px}.stat strong{font-size:22px}}
+</style>
+</head>
+<body>
+<main>
+  <div id="page-message" class="notice">جاري التحقق من حسابك...</div>
+  <section id="dashboard" class="hidden">
+    <div class="welcome"><div><h1>متابعة الأبناء</h1><p>هنا تقدر تتابع تقدم ابنك ونتائجه — للعرض فقط.</p></div><button class="btn secondary" id="refresh">تحديث البيانات</button></div>
+    <div id="student-switch" class="grid"></div>
+    <div class="grid section">
+      <div class="card stat"><small>متوسط النتائج</small><strong id="avg">—</strong></div>
+      <div class="card stat"><small>الاختبارات المسجلة</small><strong id="assess-count">—</strong></div>
+      <div class="card stat"><small>الأنشطة المنفذة</small><strong id="activity-count">—</strong></div>
+      <div class="card stat"><small>جلسات التعلم</small><strong id="sessions-count">—</strong></div>
+    </div>
+    <div class="two section">
+      <div class="card"><h2>التقدم في المواد</h2><div id="subjects"><div class="empty">جاري تحميل المواد...</div></div></div>
+      <div class="card"><h2>آخر الأنشطة</h2><div id="activities"><div class="empty">جاري تحميل الأنشطة...</div></div></div>
+    </div>
+    <div class="card section"><h2>نتائج التقييمات</h2><div id="results"><div class="empty">جاري تحميل النتائج...</div></div></div>
+    <div class="card section"><h2>طلبات الربط</h2><div id="requests"><div class="empty">لا توجد طلبات بعد.</div></div></div>
+  </section>
+</main>
+<script>
+(() => {
+ const $=id=>document.getElementById(id);
+ const client=window.supabaseClient || window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ let user=null, studentId=null;
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const msg=t=>{$('page-message').textContent=t;$('page-message').classList.remove('hidden');};
+ async function init(){
+   const {data:{user:u},error}=await client.auth.getUser();if(error||!u){location.replace('login.html');return;}user=u;
+   const {data:p}=await client.from('profiles').select('role').eq('id',user.id).maybeSingle();
+   if(p?.role!=='parent'){msg('هذه الصفحة مخصصة لحساب ولي الأمر فقط.');setTimeout(()=>location.replace('index.html'),1800);return;}
+   $('page-message').classList.add('hidden');$('dashboard').classList.remove('hidden');
+   await load();
+ }
+ async function load(){
+   const {data:links,error}=await client.from('parent_students').select('student_id').eq('parent_id',user.id).eq('active',true);
+   if(error){msg('تعذر تحميل الطلاب المرتبطين. تأكد من تطبيق تحديث قاعدة البيانات.');return;}
+   const ids=(links||[]).map(x=>x.student_id);
+   if(!ids.length){$('student-switch').innerHTML='<div class="card empty" style="grid-column:1/-1">لم يتم اعتماد ربط أي طالب لحسابك حتى الآن. أدخل كود الطالب من أداة الربط وانتظر موافقة المعلم.</div>';['avg','assess-count','activity-count','sessions-count'].forEach(id=>$(id).textContent='0');return;}
+   const {data:profiles}=await client.from('profiles').select('id,display_name,first_name,last_name,grade_level').in('id',ids);
+   $('student-switch').innerHTML=(profiles||[]).map(p=>'<button class="card" style="text-align:right;cursor:pointer" data-student="'+esc(p.id)+'"><b>'+esc(p.display_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||'الطالب')+'</b><div class="muted">'+esc(p.grade_level||'')+'</div></button>').join('');
+   $('student-switch').querySelectorAll('[data-student]').forEach(b=>b.onclick=()=>{studentId=b.dataset.student;loadStudent();});
+   studentId=studentId&&ids.includes(studentId)?studentId:ids[0];await loadStudent();
+   const {data:reqs}=await client.from('parent_link_requests').select('status,created_at').eq('parent_id',user.id).order('created_at',{ascending:false}).limit(5);
+   $('requests').innerHTML=(reqs||[]).length?(reqs||[]).map(r=>'<div class="activity">'+({pending:'بانتظار موافقة المعلم',approved:'تمت الموافقة على الربط',rejected:'تم رفض الطلب'}[r.status]||r.status)+' <span class="muted">— '+new Date(r.created_at).toLocaleDateString('ar-EG')+'</span></div>').join():'<div class="empty">لا توجد طلبات ربط.</div>';
+ }
+ async function loadStudent(){
+   if(!studentId)return;
+   const [subjects,assess,events,sessions,subs]=await Promise.all([
+     client.from('student_subjects').select('subject_id,grade_level').eq('student_id',studentId),
+     client.from('assessment_results').select('id,score,max_score,status,graded_at').eq('student_id',studentId).order('graded_at',{ascending:false}).limit(50),
+     client.from('student_activity_events').select('event_label,event_type,created_at').eq('student_id',studentId).order('created_at',{ascending:false}).limit(8),
+     client.from('student_sessions').select('id').eq('student_id',studentId),
+     client.from('activity_submissions').select('id,status').eq('student_id',studentId)
+   ]);
+   const results=assess.data||[],valid=results.filter(r=>Number(r.max_score)>0&&Number.isFinite(Number(r.score)));
+   const avg=valid.length?valid.reduce((n,r)=>n+(Number(r.score)/Number(r.max_score))*100,0)/valid.length:0;
+   $('avg').textContent=valid.length?Math.round(avg)+'%':'—';$('assess-count').textContent=results.length;$('activity-count').textContent=(subs.data||[]).length;$('sessions-count').textContent=(sessions.data||[]).length;
+   const subjectRows=subjects.data||[];
+   if(subjectRows.length){const ids=[...new Set(subjectRows.map(s=>s.subject_id).filter(Boolean))];const {data:names}=await client.from('subjects').select('id,name_ar,name').in('id',ids);const map=new Map((names||[]).map(n=>[n.id,n.name_ar||n.name]));$('subjects').innerHTML=subjectRows.map(s=>'<div class="subject"><div class="subject-head"><span>'+esc(map.get(s.subject_id)||'مادة تعليمية')+'</span><span class="muted">'+esc(s.grade_level||'مسجل')+'</span></div><div class="track"><div class="fill" style="width:0%"></div></div><small class="muted">تم تسجيل المادة — تفاصيل الإنجاز ستظهر حسب بيانات التقييم المتاحة.</small></div>').join('');}else $('subjects').innerHTML='<div class="empty">لا توجد مواد مسجلة لهذا الطالب حتى الآن.</div>';
+   $('activities').innerHTML=(events.data||[]).length?events.data.map(e=>'<div class="activity"><b>'+esc(e.event_label||e.event_type||'نشاط')+'</b><div class="muted">'+new Date(e.created_at).toLocaleString('ar-EG')+'</div></div>').join(''):'<div class="empty">لا توجد أنشطة مسجلة حتى الآن.</div>';
+   $('results').innerHTML=results.length?'<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;text-align:right"><thead><tr><th>الدرجة</th><th>من</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+results.map(r=>'<tr><td>'+esc(r.score??'—')+'</td><td>'+esc(r.max_score??'—')+'</td><td>'+esc(r.status||'—')+'</td><td>'+ (r.graded_at?new Date(r.graded_at).toLocaleDateString('ar-EG'):'—')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">لا توجد نتائج تقييم مسجلة حتى الآن.</div>';
+ }
+ $('refresh').addEventListener('click',()=>load().catch(e=>msg('تعذر تحديث البيانات.')));
+ client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')location.replace('login.html');});
+ init().catch(e=>{console.error(e);msg('حدث خطأ أثناء تحميل لوحة ولي الأمر.');});
+})();
+</script>
+<script src="js/aqdar-role-tools.js"></script>
+</body></html>
