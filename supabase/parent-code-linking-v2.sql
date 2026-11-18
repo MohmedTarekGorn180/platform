@@ -206,11 +206,11 @@ grant execute on function public.aqdar_redeem_student_code(text) to authenticate
 -- These are SELECT-only policies; no parent INSERT/UPDATE/DELETE policy is created.
 do $$
 declare
-  table_name text;
+  tbl_name text;
   policy_name text;
   has_student_id boolean;
 begin
-  foreach table_name in array array[
+  foreach tbl_name in array array[
     'student_subjects',
     'assessment_results',
     'activity_submissions',
@@ -218,21 +218,21 @@ begin
     'student_sessions',
     'student_activity_logs'
   ] loop
-    if to_regclass('public.' || table_name) is not null then
+    if to_regclass('public.' || tbl_name) is not null then
       select exists (
         select 1 from information_schema.columns
         where table_schema = 'public'
-          and information_schema.columns.table_name = table_name
+          and information_schema.columns.table_name = tbl_name
           and column_name = 'student_id'
       ) into has_student_id;
 
       if has_student_id then
-        policy_name := 'parent reads linked student ' || table_name;
+        policy_name := 'parent reads linked student ' || tbl_name;
         execute format('drop policy if exists %I on public.%I', policy_name, table_name);
         execute format(
           'create policy %I on public.%I for select to authenticated using ' ||
           '(exists (select 1 from public.parent_students ps where ps.parent_id = auth.uid() and ps.student_id = %I.student_id and ps.active = true))',
-          policy_name, table_name, table_name
+          policy_name, tbl_name, tbl_name
         );
       end if;
     end if;
