@@ -1152,7 +1152,7 @@ body{
       announce('تم تسجيل الدخول بنجاح، جاري تحويلك.');
 
       setTimeout(() => {
-        window.location.href = ({student:'student-login.html', parent:'parent-login.html', teacher:'teacher-login.html', admin:'index.html'})[String(profile.role || '').toLowerCase()] || 'index.html';
+        window.location.href = ({student:'student-login.html', parent:'parent-login.html', teacher:'teacher-login.html', admin:'teacher-login.html'})[String(profile.role || '').toLowerCase()] || 'index.html';
       }, 900);
 
     } catch (err) {
