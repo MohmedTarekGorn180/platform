@@ -23,7 +23,11 @@ begin
     requested_role := 'student';
   end if;
 
-  if lower(coalesce(new.role, '')) not in ('teacher', 'admin') then
+  -- Browser/anonymous sign-ups can never create privileged roles, even if
+  -- a client attempts to submit role='admin' or role='teacher'.
+  if coalesce(auth.role(), '') in ('anon', 'authenticated')
+     or auth.uid() = new.id
+     or lower(coalesce(new.role, '')) not in ('teacher', 'admin') then
     new.role := requested_role;
   end if;
   return new;
