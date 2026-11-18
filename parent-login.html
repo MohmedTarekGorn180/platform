@@ -20,7 +20,7 @@ main{max-width:1180px;margin:30px auto;padding:0 18px 50px}.welcome{display:flex
   <div id="page-message" class="notice">جاري التحقق من حسابك...</div>
   <section id="dashboard" class="hidden">
     <div class="welcome"><div><h1>متابعة الأبناء</h1><p>هنا تقدر تتابع تقدم ابنك ونتائجه — للعرض فقط.</p></div><button class="btn secondary" id="refresh">تحديث البيانات</button></div>
-    <div id="student-switch" class="grid"></div>
+    <div class="card section" id="link-card"><h2>ربط حساب ابنك</h2><p class="muted">اكتب الكود الذي حصلت عليه من حساب الطالب. يتم الربط مرة واحدة، وبعدها تظهر بياناته هنا.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><input id="student-code" class="btn secondary" style="flex:1;min-width:220px;text-align:left;direction:ltr;background:#fff;border:1px solid var(--line)" placeholder="AQD-XXXXXXXXXXXX" maxlength="20" autocomplete="off"><button class="btn" id="link-student">ربط الطالب</button></div><p id="link-message" class="muted" role="status"></p></div>\n    <div id="student-switch" class="grid"></div>
     <div class="grid section">
       <div class="card stat"><small>متوسط النتائج</small><strong id="avg">—</strong></div>
       <div class="card stat"><small>الاختبارات المسجلة</small><strong id="assess-count">—</strong></div>
@@ -53,13 +53,11 @@ main{max-width:1180px;margin:30px auto;padding:0 18px 50px}.welcome{display:flex
    const {data:links,error}=await client.from('parent_students').select('student_id').eq('parent_id',user.id).eq('active',true);
    if(error){msg('تعذر تحميل الطلاب المرتبطين. تأكد من تطبيق تحديث قاعدة البيانات.');return;}
    const ids=(links||[]).map(x=>x.student_id);
-   if(!ids.length){$('student-switch').innerHTML='<div class="card empty" style="grid-column:1/-1">لم يتم اعتماد ربط أي طالب لحسابك حتى الآن. أدخل كود الطالب من أداة الربط وانتظر موافقة المعلم.</div>';['avg','assess-count','activity-count','sessions-count'].forEach(id=>$(id).textContent='0');return;}
+   if(!ids.length){$('student-switch').innerHTML='<div class="card empty" style="grid-column:1/-1">لم يتم ربط أي طالب بحسابك حتى الآن. أدخل كود الطالب بالأعلى لبدء المتابعة.</div>';['avg','assess-count','activity-count','sessions-count'].forEach(id=>$(id).textContent='0');$('subjects').innerHTML='<div class="empty">اربط حساب الطالب لعرض المواد.</div>';$('activities').innerHTML='<div class="empty">لا توجد بيانات بعد.</div>';$('results').innerHTML='<div class="empty">اربط حساب الطالب لعرض النتائج.</div>';return;}
    const {data:profiles}=await client.from('profiles').select('id,display_name,first_name,last_name,grade_level').in('id',ids);
    $('student-switch').innerHTML=(profiles||[]).map(p=>'<button class="card" style="text-align:right;cursor:pointer" data-student="'+esc(p.id)+'"><b>'+esc(p.display_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||'الطالب')+'</b><div class="muted">'+esc(p.grade_level||'')+'</div></button>').join('');
    $('student-switch').querySelectorAll('[data-student]').forEach(b=>b.onclick=()=>{studentId=b.dataset.student;loadStudent();});
    studentId=studentId&&ids.includes(studentId)?studentId:ids[0];await loadStudent();
-   const {data:reqs}=await client.from('parent_link_requests').select('status,created_at').eq('parent_id',user.id).order('created_at',{ascending:false}).limit(5);
-   $('requests').innerHTML=(reqs||[]).length?(reqs||[]).map(r=>'<div class="activity">'+({pending:'بانتظار موافقة المعلم',approved:'تمت الموافقة على الربط',rejected:'تم رفض الطلب'}[r.status]||r.status)+' <span class="muted">— '+new Date(r.created_at).toLocaleDateString('ar-EG')+'</span></div>').join():'<div class="empty">لا توجد طلبات ربط.</div>';
  }
  async function loadStudent(){
    if(!studentId)return;
@@ -78,6 +76,16 @@ main{max-width:1180px;margin:30px auto;padding:0 18px 50px}.welcome{display:flex
    $('activities').innerHTML=(events.data||[]).length?events.data.map(e=>'<div class="activity"><b>'+esc(e.event_label||e.event_type||'نشاط')+'</b><div class="muted">'+new Date(e.created_at).toLocaleString('ar-EG')+'</div></div>').join(''):'<div class="empty">لا توجد أنشطة مسجلة حتى الآن.</div>';
    $('results').innerHTML=results.length?'<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;text-align:right"><thead><tr><th>الدرجة</th><th>من</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+results.map(r=>'<tr><td>'+esc(r.score??'—')+'</td><td>'+esc(r.max_score??'—')+'</td><td>'+esc(r.status||'—')+'</td><td>'+ (r.graded_at?new Date(r.graded_at).toLocaleDateString('ar-EG'):'—')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">لا توجد نتائج تقييم مسجلة حتى الآن.</div>';
  }
+ $('link-student').addEventListener('click',async()=>{
+   const code=$('student-code').value.trim();
+   if(!code){$('link-message').textContent='اكتب كود الطالب أولًا.';return;}
+   $('link-student').disabled=true;$('link-student').textContent='جاري الربط...';
+   const {error}=await client.rpc('aqdar_redeem_student_code',{p_code:code});
+   $('link-student').disabled=false;$('link-student').textContent='ربط الطالب';
+   if(error){$('link-message').textContent=error.message||'الكود غير صحيح أو تم استخدامه.';return;}
+   $('student-code').value='';$('link-message').textContent='تم ربط الطالب بنجاح. جاري تحميل بياناته...';
+   await load();
+ });
  $('refresh').addEventListener('click',()=>load().catch(e=>msg('تعذر تحديث البيانات.')));
  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')location.replace('login.html');});
  init().catch(e=>{console.error(e);msg('حدث خطأ أثناء تحميل لوحة ولي الأمر.');});
