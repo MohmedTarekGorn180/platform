@@ -537,6 +537,14 @@ body{
           </header>
 
           <form class="form" id="register-form" novalidate autocomplete="on">
+            <div class="field" data-field="reg-role">
+              <label class="field__label" for="reg-role">نوع الحساب</label>
+              <select id="reg-role" name="role" class="field__input" required>
+                <option value="student" selected>طالب</option>
+                <option value="parent">ولي أمر</option>
+              </select>
+              <p class="field__hint">حسابات المعلمين والإدارة تُفعّل من داخل النظام فقط.</p>
+            </div>
             <div class="field" data-field="reg-firstname">
               <label class="field__label" for="reg-firstname"><span>الاسم الأول</span><span class="field__required">مطلوب</span></label>
               <div class="field__wrap">
@@ -1144,7 +1152,7 @@ body{
       announce('تم تسجيل الدخول بنجاح، جاري تحويلك.');
 
       setTimeout(() => {
-        window.location.href = AFTER_LOGIN_URL;
+        window.location.href = ({student:'student-login.html', parent:'parent-login.html', teacher:'teacher-login.html', admin:'index.html'})[String(profile.role || '').toLowerCase()] || 'index.html';
       }, 900);
 
     } catch (err) {
@@ -1196,7 +1204,8 @@ body{
             first_name: firstName,
             last_name: lastName,
             username: username,
-            display_name: firstName + ' ' + lastName
+            display_name: firstName + ' ' + lastName,
+            requested_role: $('reg-role').value
           }
         }
       });
