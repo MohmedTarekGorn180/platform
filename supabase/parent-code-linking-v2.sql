@@ -1,5 +1,5 @@
 -- AQDAR parent-code linking v2
--- Run after the existing parent-accounts-and-linking.sql migration.
+-- Standalone migration: safe to run whether or not the older parent-linking draft was applied.
 -- Parent enters a one-time student code; the link is immediate and read-only.
 
 create extension if not exists pgcrypto;
