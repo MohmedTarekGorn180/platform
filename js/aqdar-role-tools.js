@@ -74,7 +74,7 @@
       });
       actions.append(generate);body.append(p1,codeEl,actions);panel('كود ربط ولي الأمر',body);
     }
-    if(role==='parent'){
+    if(role==='parent' && !location.pathname.endsWith('parent-login.html')){
       const body=document.createElement('div');
       const p1=document.createElement('p');p1.textContent='أدخل الكود الذي حصلت عليه من الطالب. سيتم ربط الحسابين مباشرة، وستتمكن من مشاهدة بيانات الطالب فقط.';
       const input=document.createElement('input');input.className='aqrb-input';input.placeholder='AQD-XXXXXXXXXXXX';input.maxLength=20;input.autocomplete='off';
@@ -90,14 +90,7 @@
       });
       actions.append(send);body.append(p1,input,actions);panel('ربط حساب الطالب',body);
     }
-    if(role==='teacher'||role==='admin'){
-      const body=document.createElement('div');const refresh=button('تحديث الطلبات',load);const list=document.createElement('div');list.className='aqrb-list';body.append(refresh,list);panel('طلبات ربط أولياء الأمور',body);
-      async function load(){list.textContent='جاري تحميل الطلبات...';let q=sb.from('parent_link_requests').select('id,parent_id,student_id,created_at').eq('status','pending').order('created_at',{ascending:false}).limit(20);const {data,error:e}=await q;if(e){list.textContent='تعذر تحميل الطلبات. تأكد من تطبيق تحديث قاعدة البيانات.';return;}list.textContent='';if(!data?.length){list.textContent='لا توجد طلبات معلقة.';return;}
-        for(const req of data){const [par,stu]=await Promise.all([sb.from('profiles').select('display_name,username').eq('id',req.parent_id).maybeSingle(),sb.from('profiles').select('display_name,username').eq('id',req.student_id).maybeSingle()]);const item=document.createElement('div');item.className='aqrb-item';const desc=document.createElement('div');desc.textContent=(par.data?.display_name||par.data?.username||'ولي أمر')+' يطلب ربط حساب الطالب '+(stu.data?.display_name||stu.data?.username||'طالب');const actions=document.createElement('div');actions.className='aqrb-actions';actions.append(button('موافقة',()=>review(req.id,true)),button('رفض',()=>review(req.id,false),true));item.append(desc,actions);list.append(item);}
-      }
-      async function review(id,approve){const {error:e}=await sb.rpc('aqdar_review_parent_link',{p_request_id:id,p_approve:approve});if(e)alert(e.message);else{alert(approve?'تمت الموافقة على الربط.':'تم رفض الطلب.');load();}}
-      load();
-    }
+
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>start().catch(console.error));else start().catch(console.error);
 })();
