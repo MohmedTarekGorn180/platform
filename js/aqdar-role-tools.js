@@ -7,8 +7,10 @@
     if (window.supabaseClient) return window.supabaseClient;
     if (window.sb) return window.sb;
     try {
-      if (window.supabase?.createClient && typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      if (window.supabase?.createClient) {
+        const url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : 'https://khjqgpbyyexbgakvajhj.supabase.co');
+        const key = (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoanFncGJ5eWV4bgYha2V2YWpoaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzkyNTg3MzExLCJleHAiOjIxMDgxNjMzMTF9.7kd44Ye1dyZZnVq8bcCVj0t1DWhAnkLkhpYA5Ndln6U');
+        return window.supabase.createClient(url, key);
       }
     } catch (_) {}
     return null;
