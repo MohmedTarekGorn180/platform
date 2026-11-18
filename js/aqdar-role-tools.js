@@ -77,7 +77,7 @@
     if(role==='parent' && !location.pathname.endsWith('parent-login.html')){
       const body=document.createElement('div');
       const p1=document.createElement('p');p1.textContent='أدخل الكود الذي حصلت عليه من الطالب. سيتم ربط الحسابين مباشرة، وستتمكن من مشاهدة بيانات الطالب فقط.';
-      const input=document.createElement('input');input.className='aqrb-input';input.placeholder='AQD-XXXXXXXXXXXX';input.maxLength=20;input.autocomplete='off';
+      const input=document.createElement('input');input.className='aqrb-input';input.placeholder='AQD-XXXXXXXXXXXXXXXXXXXX';input.maxLength=20;input.autocomplete='off';
       const actions=document.createElement('div');actions.className='aqrb-actions';
       const send=button('ربط الطالب',async()=>{
         send.disabled=true;
