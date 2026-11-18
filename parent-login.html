@@ -67,7 +67,7 @@ main{max-width:1180px;margin:30px auto;padding:0 18px 50px}.welcome{display:flex
      client.from('student_subjects').select('subject_id,grade_level').eq('student_id',studentId),
      client.from('assessment_results').select('id,score,max_score,status,graded_at').eq('student_id',studentId).order('graded_at',{ascending:false}).limit(50),
      client.from('student_activity_events').select('event_label,event_type,created_at').eq('student_id',studentId).order('created_at',{ascending:false}).limit(8),
-     client.from('student_sessions').select('id').eq('student_id',studentId),
+     client.from('student_sessions').select('student_id').eq('student_id',studentId),
      client.from('activity_submissions').select('id,status').eq('student_id',studentId)
    ]);
    const results=assess.data||[],valid=results.filter(r=>Number(r.max_score)>0&&Number.isFinite(Number(r.score)));
